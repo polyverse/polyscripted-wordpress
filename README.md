@@ -120,7 +120,7 @@ For more information contact [support@polyverse.io](mailto:support@polyverse.io)
 
 [https://github.com/polyverse/polyscripted-php](https://github.com/polyverse/polyscripted-php)
 
-[https://github.com/polyverse/ps-wordpress](https://github.com/polyverse/ps-wordpress)
+[https://github.com/polyverse/polyscripted-wordpress](https://github.com/polyverse/ps-wordpress)
 
 [https://blog.polyverse.io/introducing-polyscripting-the-beginning-of-the-end-of-code-injection-fe0c99d6f199](https://blog.polyverse.io/introducing-polyscripting-the-beginning-of-the-end-of-code-injection-fe0c99d6f199)
 
