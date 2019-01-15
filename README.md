@@ -11,7 +11,7 @@ What is Moving Target Defense? Read on...
 
 Polyscripted WordPress is sponsored by @Polyverse Corporation.
 
-### Introduction: Moving Target Defense**
+### Introduction: Moving Target Defense
 
 When it comes to programming, it is important to accept an essential fundamental truth: every piece of software is hackable. Ultimately, this means everyone is vulnerable. Given enough time and resources, a vulnerability can always be found and an exploit can be crafted. What makes this attractive to a malicious actor is that a crafted attack can be applied across a wide surface area. With any given vulnerability, a hacker is able to execute an exploit across a range of machines that meet the criteria defined by a presupposed, assumed, and known attack vector. The effort-to-reward ratio is in their favor.
 
@@ -34,9 +34,7 @@ It is easy to point fingers when it comes to security breaches. Whether it&#39;s
 Code injection is an incredibly powerful tool that hackers employ to accomplish their goals. It is an attack vector allowing a malicious actor to run their own code on a server or website belonging to a separate entity. Often, it is used as a backdoor to access information or to change and to corrupt data. Some of the most devastating breaches in history have relied on simple code injection. For example, the Equifax breach relied on code that was injected through an unprotected deserialization call. There are certain methods to meticulously guard against code injection, such as input sanitization, code signing and whitelisting. Despite the techniques that exist to thwart code injection, such attacks continue to occur at an increasingly alarming rate. September 2018 alone saw numerous noteworthy code injection attacks:
 
 * Scarma Labs published a white-paper before blackhat 2018 that described a PHP vulnerability that has gone unpatched and unreported for over a year since they first notified various services of the issue, WordPress, the most used CMS on the internet, as of a few weeks after the reports, had still not issued a fix for the vulnerability which allows code injection.1
--
 * A zero-day bug allowed hackers to access CCTV surveillance cameras, and subsequent code injection and remote code execution allowed hackers to gain access to user accounts as well as change passwords.2
--
 * A Remote Code Execution vulnerability existed in the widely popular Duplicator WordPress plugin that affected many users, this was patched September 5th 2018.3
 
 Needless to say, this exploit is hardly a thing of the past.
@@ -45,17 +43,18 @@ Equifax is probably the most potent example of code injection that led to an inc
 
 The Jakarta parser had a feature that allows you to deserialize XML into Java objects. A simplified version looks like this:
 
-\&lt;object class=&quot;io.polyverse.Person&quot;\&gt;
-        \&lt;field name=&quot;Name&quot;\&gt;Archis\&lt;/field\&gt;
-        \&lt;field name=&quot;City&quot;\&gt;Seattle\&lt;/field\&gt;
-\&lt;/object\&gt;
+```<object class="io.polyverse.Person">
+	<field name="Name">Archis</field>
+	<field name="City">Seattle</field>
+</object>```
+
 
 All someone had to do was try to instantiate an internal object:
 
-\&lt;object class=&quot;java.system.Exec&quot;\&gt;
-        \&lt;field name=&quot;Command&quot;\&gt;/bin/rm\&lt;/field\&gt;
-        \&lt;field name=&quot;Params&quot;\&gt;-rf\&lt;/field\&gt;
-\&lt;/object\&gt;
+```<object class="java.system.Exec">
+	<field name="Command">/bin/rm</field>
+	<field name="Params">-rf</field>
+</object>```
 
 The Struts vulnerability allowed any and all objects to be instantiated by default when no whitelist/blacklist was provided. The hackers were able to inject code and execute it remotely.
 
@@ -81,22 +80,19 @@ It comes down to **cause** and **effect**. Whether the cause of code injection i
 
 In a basic workflow for a standard website running PHP, the PHP interpreter is compiled and loaded onto the web server. The website&#39;s source code is also pushed to the same server. The PHP interpreter then parses and interprets the source code before sending the result elsewhere: to a user, browser, database, etc.
 
-
-
-
-
 At a very basic level, this is a two-step process:
 
-**                               **  **1. Build                               2. Run**
+ 1. Build    
+ 2. Run
+
+ ![PHP](https://github.com/polyverse/polyscripted-php/blob/master/images/php-flow.png)
 
 
 ### Polyscripting Workflow
 
 Polyscripting only adds one additional layer to this deployment process. The PHP source code gets scrambled to the polyscripted version and the websites source code gets scrambled to match the unique instance of PHP that was generated. The interpreter for the language (PHP) is changed at compile time and, ideally, the scrambled dictionary is only accessed and only exists **before** being deployed to a web server.
 
-**       **
-
-**                       **  **1. Build   2. Scramble &amp; Transform  3. Run**
+1. Build   2. Scramble &amp; Transform  3. Run
 
  ![Polymorphic PHP](https://github.com/archisgore/diagrams/blob/master/Polyscripted%20Wordpress.png)
 
@@ -108,7 +104,7 @@ The values of the keywords themselves are arbitrary in any given language. Keywo
 
 
 
-###Conclusion**
+### Conclusion
 
 Polyscripting has the potential to be a powerful tool to defend against code-injection attacks. Though scrambling keywords is powerful, there are many other ways to increase the effectiveness of Polyscripting. Scrambling more than just keywords, but also built-in PHP functions, is a feature that would increase Polyscripting&#39;s effectiveness and is a likely addition in the near future. Similarly, scrambling more than the language tokens, but also the grammar and the Abstract Syntax Tree of the language will add an entirely new layer of security to any language Polyscripting is applied to. Polyverse is creating a new standard to expect from programming languages —Polyscripting capabilities.
 
