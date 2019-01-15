@@ -1,9 +1,9 @@
 FROM polyverse/ps-php7.2-fpm:alpine-5df518d152d9bbfa90df89e2bf561f43fcbf3ec8
 
 RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io; \
-	sed -n -i '/repo.polyverse.io/p' /etc/apk/repositories; \
-	apk update; \
-	apk upgrade --no-cache --available
+        apk update; \
+        apk upgrade --no-cache --available; \
+        sed -in 's/^#//g' /etc/apk/repositories;
 
 # docker-entrypoint.sh dependencies
 RUN apk add --no-cache \
