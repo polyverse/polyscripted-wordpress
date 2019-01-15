@@ -29,7 +29,7 @@ To start WordPress without Polyscripting simply run the run script:
 
 In this mode you can add plugins, themes, or any other php files.
 
-To then start the same WordPress site with polyscripting enable run the run script with the polyscript arguement:
+To then start the same WordPress site with polyscripting enabled run the run script with the polyscript arguement:
 
 ```bash
 ./run.sh polyscripted
@@ -38,6 +38,8 @@ To then start the same WordPress site with polyscripting enable run the run scri
 Its that simple. You can configure your own website and database as well, we have just provided tools to get you started with a simple use case.
 
 
+-----
+ 
 ### Introduction: Moving Target Defense
 
 When it comes to programming, it is important to accept an essential fundamental truth: every piece of software is hackable. Ultimately, this means everyone is vulnerable. Given enough time and resources, a vulnerability can always be found and an exploit can be crafted. What makes this attractive to a malicious actor is that a crafted attack can be applied across a wide surface area. With any given vulnerability, a hacker is able to execute an exploit across a range of machines that meet the criteria defined by a presupposed, assumed, and known attack vector. The effort-to-reward ratio is in their favor.
