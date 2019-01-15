@@ -11,6 +11,33 @@ What is Moving Target Defense? Read on...
 
 Polyscripted WordPress is sponsored by @Polyverse Corporation.
 
+## How to Use this Repo
+
+This repo is forked from the official wordpress docker library repo, with the only changes to the repo being to enable polyscripted wordpress.
+
+We have added polyscripting to two implementations of the main repo: FPM-Alpine, and Apache.
+
+We recommend using the alpine version, because in addition to polyscripting, we have added our Polymorphic version of Linux to this build. This is Polyverse's flagship product that uses a custom compiler on the entirety of the Linux stack to scramble the binaries: changing register usage, function locations, import tables, and so on to produce individually unique binaries that are semantically equivalent. [Check out our website for more info.](https://polyverse.io/how-it-works/)
+
+Both directories contain a build script (publish-image.sh) and a run script (run.sh).
+
+To start WordPress without Polyscripting simply run the run script:
+
+```bash
+./run.sh
+```
+
+In this mode you can add plugins, themes, or any other php files.
+
+To then start the same WordPress site with polyscripting enable run the run script with the polyscript arguement:
+
+```bash
+./run.sh polyscripted
+```
+
+Its that simple. You can configure your own website and database as well, we have just provided tools to get you started with a simple use case.
+
+
 ### Introduction: Moving Target Defense
 
 When it comes to programming, it is important to accept an essential fundamental truth: every piece of software is hackable. Ultimately, this means everyone is vulnerable. Given enough time and resources, a vulnerability can always be found and an exploit can be crafted. What makes this attractive to a malicious actor is that a crafted attack can be applied across a wide surface area. With any given vulnerability, a hacker is able to execute an exploit across a range of machines that meet the criteria defined by a presupposed, assumed, and known attack vector. The effort-to-reward ratio is in their favor.
@@ -43,9 +70,21 @@ Equifax is probably the most potent example of code injection that led to an inc
 
 The Jakarta parser had a feature that allows you to deserialize XML into Java objects. A simplified version looks like this:
 
+```java
+<object class="io.polyverse.Person">
+	<field name="Name">Archis</field>
+	<field name="City">Seattle</field>
+</object>
+```
 
 All someone had to do was try to instantiate an internal object:
 
+```java
+<object class="java.system.Exec">
+	<field name="Command">/bin/rm</field>
+	<field name="Params">-rf</field>
+</object>
+```
 
 The Struts vulnerability allowed any and all objects to be instantiated by default when no whitelist/blacklist was provided. The hackers were able to inject code and execute it remotely.
 
@@ -91,9 +130,52 @@ Polyscripting only adds one additional layer to this deployment process. The PHP
 
 The process of scrambling a language is beautifully simple. The make-up of a programming language is contained within its syntax and grammar. The keywords and syntax of a language are defined and compiled to make up the words and ordering of word-tokens that a language understands. Programs are then parsed based on this lexical syntax to generate the grammar the further defines a language.
 
+ ![scramble](https://github.com/polyverse/polyscripted-php/blob/master/images/polyscript_dictionary.png)
+
+
 The values of the keywords themselves are arbitrary in any given language. Keywords are defined for the convenience of those writing the code. If you think of these words as just a means to write a language, the values themselves are random. Where &quot;echo&quot; is defined in the lexical grammar, a replacement could be defined with any randomized value. If you replace &quot;echo&quot; in the lex file with &quot;foo&quot; and then run the code: foo &quot;hello world,&quot; it will echo the string given. However if you try to run the code: echo &quot;hello world&quot;, a syntax error will be thrown. The language no longer understands ``` echo ```, but treats the command ```foo```; as it would previously have treated ```echo```.
 
+### Scrambled Lex File
 
+The result of scrambling these keywords is a language interpreter that understands only unique strings as its reserved keywords. While no longer understanding the original keywords. “Use” is now an unparsable command, but "nhZjBhADI" will be linked to the same functionality. Below is a snippet from the PHP lex file before and after scrambling.
+If a malicious actor was able to get a piece of code injected within a website that has been polyscripted, accessing that code will result in a syntax error. Not only does this stop the attack, but it also acts as a means of detection and notification for attempted attacks.
+
+ ![lex](https://github.com/polyverse/polyscripted-php/blob/master/images/polyscripted_lex.png)
+
+
+### Transforming Source Code
+
+The process of scrambling the language is, by its very nature, similar to the process of transforming it. In order for an interpreter to understand the code it is parsing, it needs to be transformed to the proper scramble. While scrambling the interpreter a JSON file is also built that contains a dictionary of the tokens to the scrambled values. This dictionary of values will act as instructions to transform the application’s source code. This dictionary does not sit on the server since scrambling and transforming take place prior to deployment. It is worth noting that the dictionary **is not required to run the polyscripted code**. This effectively makes the transformation an irreversible operation for the attacker. Without the dictionary, the output is meaningless, and the attacker has no context. 
+
+ ![example](https://github.com/polyverse/polyscripted-php/blob/master/images/PolyscriptExampleDark.png)
+
+Unlike varying types of encryption, there is no key or secret value necessary to understand the scramble or for the program to run properly. The default becomes the secure, Polyscripted state. After scrambling and transforming, the dictionary can be deleted and the Polyscripted code will still run identically to the language from which it was derived. Unlike obfuscation, Polyscripting isn’t simply making source code more difficult for someone to read. A site with obfuscated code will still run the language normally, including injected code. Polyscripting scrambles the language itself; it changes the actual makeup of a language, the actual definitions contained within a language’s pre-compiled source code.
+
+Of course, it is worth noting that there are exceptions to this. Any dynamically-generated code will not be able to be interpretted either. Additionally this means, if you want to download plugins or add any php source code to your sites, this needs to be down with polyscripting turned off. For security, you will need to install the plugin during the initial build of the site and before the scrambling process.
+
+### Instructions and Scrambling
+
+The process of transformation traverses the source code of an app and uses the instructions to change the syntax to match the proper scramble. Much like the behavior of the interpreter will not be affected, the scrambling of the source code will not affect how the output and behavior of the code. The transformation only changes the way the way that tokens will be recognized by the parser.
+
+An interpreter parses a language by identifying the role of each part of the code. Given certain rules within the interpreter (in fact, the very rules that are changed during polyscritping) it is able to recognize and tokenize certain values. By using those exact rules contained within the interpreter the transformer simply parses each PHP file, but replaces the original token values with the scrambled ones provided by the instructions. 
+
+The language has a source of truth within it: its scanner and parser. If we use these exact methods to transform the language to the scrambled version, it ensure that it is being parsed exactly as it will be when being executed. Because of this the logic of the code does not change.
+
+Put simply, the transformation process is done in such a way as to not affect the output of the code itself. Though the keywords are changing, the functionality of the instructions and the programming language remains the same.
+
+### PHP as Proof of Concept
+
+Polyscripting is an elegant solution to a real problem. Polyverse’s current R&D team is working on developing a usable open-source version of Polyscripting that scrambles PHP. The project is freely available on Github under an MIT license. The purpose of this project is to demonstrate a moving target defense strategy in a real and meaningful way. Polyverse strives to make cybersecurity simple and manageable. PHP is only the first of many languages, and the team wants to apply the same simple concept to other programming languages.
+
+This then begs the question: if the goal of Polyscripting is to apply the concepts across a wide spectrum of vulnerable server-side languages, why start with PHP? The answer is pretty simple: because people use it. Over a quarter of the internet is using WordPress to build out their websites. WordPress is—by a significant margin—the most used CMS in the world. All while being open source. It is also written in PHP. Not to mention the other CMS players that use PHP. Regardless of the critiques it endures, PHP is widely used because of this kind of popularity. It is also an open source interpreted language with a grammar and syntax that is accessible and easily manipulated, which is ideal for an open-source proof of concept like Polyscripting.
+
+Its popularity also makes PHP a heavily targeted language. The previously mentioned exploits utilize PHP vulnerabilities to inject malicious code. To further compound the issue, millions of sites run antiquated versions of PHP that are no longer supported that contain well-known vulnerabilities. To update an entire code base is a task many are unable to take on due to a lack of resources, whether financial, chronological, or otherwise, subsequently leaving their product vulnerable to various threats. 
+
+PHP is the perfect language for demonstrating Polyscripting. Not only because of the ease of implementation and its widespread use, but because Polyscripting has the potential to solve meaningful problems that application’s utilizing PHP encounter. 
+
+### Polyscripted WordPress
+
+Though Polyverse's main project is a polymorphic version of Linux, we have committed fully to our open source project. We have reached out to mulitple hosting providers, sponsored WordCamp events, and talked with WordPress security teams with the intention of bringing a meaningful product to the opensource world. Since WordPress is the biggest name in the community, we have been dedicated to creating the product to be usable by the WordPress community.
 
 ### Conclusion
 
