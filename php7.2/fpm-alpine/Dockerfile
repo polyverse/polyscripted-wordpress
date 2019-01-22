@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.2-fpm:alpine-5df518d152d9bbfa90df89e2bf561f43fcbf3ec8
+FROM polyverse/ps-php7.2-fpm:95206c2063c57fd02f112547a5a7023f920eec29
 
 RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io; \
         apk update; \

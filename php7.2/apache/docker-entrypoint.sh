@@ -51,10 +51,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	    exit 1
 	fi
 
-	if [ ! -f "$PATH/s_php" ]; then
-        cp /usr/local/bin/php /usr/local/bin/s_php
-    fi
-
     cd /wordpress
 
 	if [ ! -e index.php ] && [ ! -e wp-includes/version.php ]; then
