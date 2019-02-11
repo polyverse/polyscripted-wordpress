@@ -71,10 +71,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			--extract
 			--file -
 		)
-		if [ "$user" != '0' ]; then
+		#if [ "$user" != '0' ]; then
 			# avoid "tar: .: Cannot utime: Operation not permitted" and "tar: .: Cannot change mode to rwxr-xr-x: Operation not permitted"
-			targetTarArgs+=( --no-overwrite-dir )
-		fi
+			#targetTarArgs+=( --no-overwrite-dir )
+		#fi
 		tar "${sourceTarArgs[@]}" . | tar "${targetTarArgs[@]}"
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
