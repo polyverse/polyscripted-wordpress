@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.2-apache:95206c2063c57fd02f112547a5a7023f920eec29
+FROM  polyverse/ps-php7.2-apache:effc64693d925c9ec515c9ccb22dd247e45de647
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -56,8 +56,10 @@ RUN set -ex; \
 	rm wordpress.tar.gz; \
 	chown -R www-data:www-data /usr/src/wordpress
 
+WORKDIR $POLYSCRIPT_PATH
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
+
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
