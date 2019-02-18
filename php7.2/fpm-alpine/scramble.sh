@@ -21,7 +21,14 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 		echo "done"
 	else
 		echo "Polyscripting failed."
+		cp /usr/local/bin/s_php /usr/local/bin/php
 		exit 1
+	fi
+	if [-d /uploads ]; then
+		ln -s /uploads /var/www/html/wp-content/uploads
+	else 	
+		rm  -rf /var/www/html/wp-content/uploads
+		ln -s /wordpress/wp-content/uploads /var/www/html/wp-content/uploads
 	fi
 else
     echo "Polyscripted mode is off. To enable it, either:"
@@ -31,3 +38,4 @@ else
     # Symlink the mount so it's editable
     ln -s /wordpress /var/www/html
 fi
+
