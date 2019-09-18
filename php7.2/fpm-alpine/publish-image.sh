@@ -6,7 +6,7 @@ echo "$(date) Obtaining current git sha for tagging the docker image"
 headsha=$(git rev-parse --verify HEAD)
 
 
-docker build -t $image:alpine-$headsha .
+docker build -t $image:alpine-$headsha . --no-cache
 docker tag $image:alpine-$headsha $image:alpine-latest
 docker tag $image:alpine-$headsha $image:latest
 
