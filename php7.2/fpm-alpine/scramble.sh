@@ -13,6 +13,11 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 	fi
 
 	echo "Starting polyscripted WordPress"
+
+	if [ "$POLY_QUIET" != true ]; then
+		sed -i "/<h2><?php echo esc_html("Polyscripted Mode Enable")/a\<h1><?php echo esc_html( $title ); ?></h1>" /var/www/html/wp-admin/index.php
+	fi
+
 	cd $POLYSCRIPT_PATH
 	sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
     	./build-scrambled.sh
