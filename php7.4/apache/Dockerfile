@@ -1,5 +1,14 @@
 FROM polyverse/ps-php7.4-apache:6c4adc6c1eb9d4570b3d424afef257b923850a4d
 
+# persistent dependencies
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+# Ghostscript is required for rendering PDF previews
+		ghostscript \
+	; \
+	rm -rf /var/lib/apt/lists/*
+
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
@@ -7,13 +16,15 @@ RUN set -ex; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		libfreetype6-dev \
 		libjpeg-dev \
 		vim \
 		libmagickwand-dev \
 		libpng-dev \
+		libzip-dev \
 	; \
 	\
-	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
+	docker-php-ext-configure gd --with-freetype --with-jpeg; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \
@@ -36,6 +47,7 @@ RUN set -ex; \
 		| sort -u \
 		| xargs -rt apt-mark manual; \
 	\
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*
 
 # set recommended PHP.ini settings
@@ -79,14 +91,14 @@ RUN set -eux; \
 	a2enconf remoteip; \
 # https://github.com/docker-library/wordpress/issues/383#issuecomment-507886512
 # (replace all instances of "%h" with "%a" in LogFormat)
-	find /etc/apache2 -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
+	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 
 # Keep compiled layer up top so it is reused when scripts are modified.
 WORKDIR $PHP_SRC_PATH
 RUN make install
 
-ENV WORDPRESS_VERSION 5.2.3
-ENV WORDPRESS_SHA1 5efd37148788f3b14b295b2a9bf48a1a467aa303
+ENV WORDPRESS_VERSION 5.3.2
+ENV WORDPRESS_SHA1 fded476f112dbab14e3b5acddd2bcfa550e7b01b
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
@@ -99,7 +111,6 @@ RUN set -ex; \
 WORKDIR $POLYSCRIPT_PATH
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
-
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

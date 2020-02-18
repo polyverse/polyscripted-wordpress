@@ -46,12 +46,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	fi
 
 	if [ ! -d /wordpress ]; then
-	    echo "Please mount a directory at /wordpress where unscrambled wordpress can be saved. "
-	    echo "You may mount an empty directory and it will be auto-populated with WordPress."
-	    exit 1
+		echo "Please mount a directory at /wordpress where unscrambled wordpress can be saved. "
+		echo "You may mount an empty directory and it will be auto-populated with WordPress."
+		exit 1
 	fi
-
-    cd /wordpress
+	cd /wordpress
 
 	if [ ! -e index.php ] && [ ! -e wp-includes/version.php ]; then
 		# if the directory exists and WordPress doesn't appear to be installed AND the permissions of it are root:root, let's chown it (likely a Docker-created directory)
@@ -98,7 +97,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 	fi
 
-	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 	# allow any of these "Authentication Unique Keys and Salts." to be specified via
 	# environment variables with a "WORDPRESS_" prefix (ie, "WORDPRESS_AUTH_KEY")
 	uniqueEnvs=(
@@ -170,7 +168,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 				}
 				{ print }
 			' wp-config-sample.php > wp-config.php <<'EOPHP'
-// If we're behind a proxy server and using HTTPS, we need to alert Wordpress of that fact
+// If we're behind a proxy server and using HTTPS, we need to alert WordPress of that fact
 // see also http://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
 	$_SERVER['HTTPS'] = 'on';
@@ -296,10 +294,10 @@ EOPHP
 		unset "$e"
 	done
 
-    if [ -e /usr/local/bin/scramble.sh ]; then
-        echo "Scrambler script found. Calling it..."
-        /usr/local/bin/scramble.sh
-    fi
+	if [ -e /usr/local/bin/scramble.sh ]; then
+		echo "Scrambler script found. Calling it..."
+		/usr/local/bin/scramble.sh
+	fi
 fi
 
 if [ -f "/usr/local/bin/s_php" ]; then
