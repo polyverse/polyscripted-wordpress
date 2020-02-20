@@ -1,11 +1,20 @@
 #!/bin/bash
 
-MODE=$1
+if [[ "$MODE" == "" ]]; then
+	MODE="unpolyscripted"
+fi
 
-echo "Running under mode: $MODE"
+WORDPRESSDIR=$PWD/wordpress
+
+
+echo "Running under mode: $MODE."
+echo "==> You must specify \$MODE=polyscripted to enable polyscripting."
+echo ""
+echo "Using wordpress installation from directory: $WORDPRESSDIR"
+echo "==> You may override this by specifying \$WORDPRESSDIR=/your/preferred/directory"
+echo "==> A new installation will be created if one does not already exist."
 
 echo "$(date) Obtaining current git sha for tagging the docker image"
 headsha=$(git rev-parse --verify HEAD)
 
-docker run --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-docker run --rm -e MODE=$MODE --name wordpress -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80  polyverse/polyscripted-wordpress:debian-$headsha
+docker run --rm -e MODE=$MODE --name wordpress -v $WORDPRESSDIR:/wordpress -p 8000:80  polyverse/polyscripted-wordpress:debian-$headsha
