@@ -24,10 +24,11 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 		cp /usr/local/bin/s_php /usr/local/bin/php
 		exit 1
 	fi
+	
+	rm  -rf /var/www/html/wp-content/uploads
 	if [ -d /uploads ]; then
 		ln -s /uploads /var/www/html/wp-content/uploads
 	else 	
-		rm  -rf /var/www/html/wp-content/uploads
 		ln -s /wordpress/wp-content/uploads /var/www/html/wp-content/uploads
 	fi
 else
