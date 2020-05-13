@@ -1,0 +1,19 @@
+name: Publish Polyscripted Wordpress Docker Image to Github Package Repository
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Get gitsha
+      id: get_sha
+      run: echo ::set-env name=SHA_TAG::$(git rev-parse --verify HEAD)
+    - name: Publish to Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: polyverse/polyscripted-wordpress
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        registry: docker.pkg.github.com
+        tags: "latest,${{ env.RELEASE_VERSION }"
+        context: php7.4/apache/
