@@ -8,11 +8,11 @@ jobs:
     - name: Publish to Github Registry
       uses: mr-smithers-excellent/docker-build-push@v3
       with:
-        name: polyverse/polyscripted-wordpress
+        name: ${{ github.repository }}/polyscripted-wordpress
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
-        tags: "latest,${{ GITHUB_SHA }}"
+        tags: "latest,${{ github.sha }}"
         directory: php7.4/apache/
     - name: Publish to Docker Hub
       uses: mr-smithers-excellent/docker-build-push@v3
