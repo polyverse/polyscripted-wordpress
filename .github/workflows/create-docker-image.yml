@@ -12,8 +12,8 @@ jobs:
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: polyverse/polyscripted-wordpress
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
-        tags: "latest,${{ env.RELEASE_VERSION }}"
+        tags: "latest,${{ env.SHA_TAG }}"
         context: php7.4/apache/
