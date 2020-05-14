@@ -1,4 +1,4 @@
-name: Publish Polyscripted Wordpress Docker Image to Github Package Repository
+name: php7.2 fpm Docker Image
 on: [push]
 jobs:
   build:
