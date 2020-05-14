@@ -15,10 +15,10 @@ jobs:
         shell: bash
         working-directory: ./php7.2/apache/
       - name: Publish 7.2 Fpm
-          run: ./publish-image.sh -p
-          shell: bash
-          working-directory: ./php7.2/fpm-alpine/
+        run: ./publish-image.sh -p
+        shell: bash
+        working-directory: ./php7.2/fpm-alpine/
       - name: Publish 7.4 Apache
-          run: ./publish-image.sh -p
-          shell: bash
-          working-directory: ./php7.4/apache/
+        run: ./publish-image.sh -p
+        shell: bash
+        working-directory: ./php7.4/apache/
