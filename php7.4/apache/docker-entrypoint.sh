@@ -312,4 +312,6 @@ if [ -f "/usr/local/bin/s_php" ]; then
 fi
 
 # Start cron in the background then run the provided process...
-exec "cron && $@"
+cron
+
+exec "$@"
