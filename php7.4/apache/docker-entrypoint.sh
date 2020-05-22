@@ -289,13 +289,6 @@ EOPHP
 		fi
 	fi
 
-	# Disable WP_CRON
-	set_config 'DISABLE_WP_CRON' "true";
-
-	# instead setup crontab
-	echo "*/5 * * * * curl http://localhost/wp-cron.php?doing_wp_cron >/dev/null 2>&1" > /etc/crontab
-
-
 	# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
 	for e in "${envs[@]}"; do
 		unset "$e"
@@ -311,5 +304,4 @@ if [ -f "/usr/local/bin/s_php" ]; then
     rm -rf /usr/local/bin/s_php
 fi
 
-# Start cron in the background then run the provided process...
-exec "cron && $@"
+exec "$@"

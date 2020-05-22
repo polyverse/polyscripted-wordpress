@@ -6,8 +6,6 @@ RUN set -eux; \
 	apt-get install -y --no-install-recommends \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
-# cron required for wp-cron
-		cron \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
