@@ -309,8 +309,6 @@ if [ -f "/usr/local/bin/s_php" ]; then
 fi
 
 # Start cron in the background then run the provided process...
-echo "Starting cron daemon in the background..."
 cron
 
-echo "Executing command: $@"
 exec "$@"
