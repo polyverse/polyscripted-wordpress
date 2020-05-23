@@ -40,7 +40,7 @@ fi
 echo "---------------------------WORDPRESS DIRECTORY---------------------------------"
 if [[ "$WORDPRESSDIR" == "" ]]; then
 	echo "    A Wordpress directory was not specified. Using a default directory"
-	echo "    under the current path: $PWD/wordpress." 
+	echo "    under the current path: $PWD/wordpress."
 	echo ""
 	echo "    NOTE: You may skip this by specifying \$WORDPRESSDIR=<path>"
 	echo "    A new installation will be created if one does not already exist."
@@ -66,8 +66,8 @@ wpvars=${!WORDPRESS_@}
 for wpvar in $wpvars; do
 	echo "$wpvar=${!wpvar}"
 	wpvarparams="$wpvarparams -e $wpvar=\"${!wpvar}\""
-	
-	if [[ "$wpvars" == "WORDPRESS_DB_HOST" ]]; then
+
+	if [[ "$WORDPRESS_DB_HOST" != "" ]]; then
 		dbfound=true
 	fi
 done
