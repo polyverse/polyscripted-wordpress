@@ -111,5 +111,6 @@ WORKDIR $POLYSCRIPT_PATH
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
 
+EXPOSE 8080
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
