@@ -35,22 +35,22 @@ add_action( 'admin_notices', 'set_polyscript_status' );
 function poly_css() {
     echo "
 	<style type='text/css'>
-	#dolly {
+	#poly {
 		float: right;
 		padding: 5px 10px;
 		margin: 0;
-		font-size: 12px;
+		font-size: 15px;
 		line-height: 1.6666;
 	}
-	.rtl #dolly {
+	.rtl #poly {
 		float: left;
 	}
-	.block-editor-page #dolly {
+	.block-editor-page #poly {
 		display: none;
 	}
 	@media screen and (max-width: 782px) {
-		#dolly,
-		.rtl #dolly {
+		#poly,
+		.rtl #poly {
 			float: none;
 			padding-left: 0;
 			padding-right: 0;

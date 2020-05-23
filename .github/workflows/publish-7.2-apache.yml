@@ -1,8 +1,8 @@
-name: Publish Polyscripted Wordpress Docker Image to Github Package Repository
+name: Publish 7.4 Apache Image 
 on: 
   push:
     paths: 
-      - 'php7.4/apache/**'
+      - 'php7.2/apache/**'
 jobs:
     build:
       runs-on: ubuntu-latest
@@ -13,16 +13,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Publish 7.4 Apache Docker Hub
+      - name: Publish 7.2 Apache Docker Hub
         run: ./publish-image.sh -p
         shell: bash
-        working-directory: ./php7.4/apache/
+        working-directory: ./php7.2/apache/
       - uses: azure/docker-login@v1
         with:
           login-server: docker.pkg.github.com
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish 7.4 Apache Docker Hub
+      - name: Publish 7.2 Git Package Repository
         run: ./publish-image.sh -g
         shell: bash
-        working-directory: ./php7.4/apache/ 
+        working-directory: ./php7.2/apache/ 
