@@ -19,6 +19,7 @@ jobs:
         working-directory: ./php7.4/apache/
       - uses: azure/docker-login@v1
         with:
+          login-server: docker.pkg.github.com
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish 7.4 Apache Docker Hub
