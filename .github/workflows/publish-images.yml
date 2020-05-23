@@ -2,7 +2,7 @@ name: Publish Polyscripted Wordpress Docker Image to Github Package Repository
 on: 
   push:
     paths: 
-      - 'php7.4/apache'
+      - 'php7.4/apache/**'
 jobs:
     build:
       runs-on: ubuntu-latest
