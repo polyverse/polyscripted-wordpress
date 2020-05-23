@@ -301,7 +301,7 @@ EOPHP
 fi
 
 if [ -f "/usr/local/bin/s_php" ]; then
-    #rm -rf /usr/local/bin/s_php
+    rm -rf /usr/local/bin/s_php
 fi
 
 exec "$@"
