@@ -1,3 +1,5 @@
+#!/bin/bash
+
 image="polyverse/polyscripted-wordpress"
 name="polyscripted-wordpress"
 tag="7.4-apache"
