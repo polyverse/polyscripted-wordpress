@@ -110,6 +110,7 @@ RUN set -ex; \
 WORKDIR $POLYSCRIPT_PATH
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
+COPY scripts/* $POLYSCRIPT_PATH/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
