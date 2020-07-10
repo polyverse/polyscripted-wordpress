@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.2-stretch-apache:0287bf360c891dae6b9295fd9c0f68fd7111d3da
+FROM polyverse/ps-php7.2-stretch-apache:bba9927d5e4c7636b200c663070bacb6aecdc509
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
