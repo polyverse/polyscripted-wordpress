@@ -11,22 +11,8 @@ docs=$dir/docs
  
 function wtf_server () {
     while true ; do
-        read msg
-        case $msg in
-            i | index )
-                ls $docs ;;
-            get\ * )
-                f=${msg#get }
-                cat $docs/$f ;;
-            t | time )
-                date ;;
-            u | uptime )
-                uptime ;;
-            * )
-                echo "Commands: t, time; u, uptime; i, index; get <file>"
-                echo "    ctrl-c to exit"
-        esac
-        echo -n "> "
+    	read msg
+        echo "You said: '$msg'"
     done
 }
  
