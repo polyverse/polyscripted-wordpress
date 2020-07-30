@@ -18,16 +18,19 @@ RUN set -ex; \
 	apt-get install -y --no-install-recommends \
 		libfreetype6-dev \
 		libjpeg-dev \
+		netcat \
 		vim \
 		libmagickwand-dev \
 		libpng-dev \
 		libzip-dev \
 	; \
 	\
+	php -i; \
 	docker-php-ext-configure gd --with-freetype --with-jpeg; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \
+		sockets \
 		gd \
 		mysqli \
 		opcache \
@@ -112,5 +115,5 @@ COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
 COPY scripts/* $POLYSCRIPT_PATH/
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
+HEALTHCHECK CMD mysqladmin ping --silent
+EXPOSE 80/tcp 
