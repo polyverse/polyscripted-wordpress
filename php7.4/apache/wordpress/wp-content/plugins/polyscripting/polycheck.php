@@ -97,19 +97,29 @@ function polyscript_rescramble() {
     // No Timeout
     set_time_limit(0);
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n");
-    //$stream = stream_socket_client("tcp://$host:$port");
+    $stream = stream_socket_client("tcp://$host:$port");
     //$socket = socket_import_stream($stream);
     //socket_set_option($socket, SOL_SOCKET, SO_KEEPALIVE, 1);
 
     print("hello");
     print($host . ":" . $port);
 
+    fwrite($stream, "1 ");
 
-    $result = socket_connect($socket, $host, $port) or die("Could not connect to socket\n");
-    //socket_write ( $socket , chr(1)) or die ("could not write");
-    socket_send($socket, "1", strlen("1"), MSG_OOB);
+    stream_socket_shutdown($stream, STREAM_SHUT_WR); /* This is the important line */
 
-    socket_shutdown($socket);
+    $contents = stream_get_contents($stream);
+
+    fclose($stream);
+
+    echo $contents;
+    echo "done";
+
+//    $result = socket_connect($socket, $host, $port) or die("Could not connect to socket\n");
+//    $res = socket_write ( $socket , chr(1)) or die ("could not write");
+//    socket_send($socket, "1\0", strlen("2"), MSG_EOR) or die ("Could not send");
+
+    //socket_shutdown($socket);
     //update_polyscript_state("scrambling");
 
 }

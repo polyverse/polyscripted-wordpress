@@ -15,7 +15,7 @@ function wtf_server () {
 	echo "Enter" >> txt.txt
     while true ; do
 	    echo "While" >> txt.txt
-    read msg
+    read -d ' ' msg
         case $msg in
             1 )
 		    echo "1" >> txt.txt
