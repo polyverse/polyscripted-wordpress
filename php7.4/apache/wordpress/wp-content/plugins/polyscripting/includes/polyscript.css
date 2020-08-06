@@ -1,0 +1,122 @@
+#status-label {
+    font-size: 14px;
+    margin: 15px;
+}
+.loader {
+    border: 5px solid #313131;
+    border-top: 5px solid #49a0fc;
+    border-bottom: 5px solid #49a0fc;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.ps-button {
+    background-color: gray; /* blue */
+    border: none;
+    color: white;
+    padding: 10px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.inline {
+    display: inline-block;
+}
+
+.ps-button:hover {
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.ps-unscramble {
+    background-color: #eb8500; /* Green */
+
+}
+
+.ps-rescramble {
+    background-color: #3e4eb3; /* Green */
+}
+
+.ps-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+.polyscript-box-header {
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+    line-height: 1.5;
+}
+
+.polyscript-lower {
+    margin: 0 auto;
+    text-align: left;
+    max-width: 45rem;
+    padding: 1.5rem;
+}
+
+.polyscript-masthead {
+    margin: 10px;
+    background-color:#fff;
+    text-align:center;
+    box-shadow:0 1px 0 rgba(200,215,225,0.5),0 1px 2px #e9eff3
+}
+
+.widget {
+    height: 10em;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.polyscript-box .centered {
+    text-align: center;
+}
+.polyscript-masthead__inside-container {
+    padding:.375rem 0;
+    margin:0 auto;
+    width:100%;
+    max-width:45rem;
+    text-align: right;
+}
+.polyscript-masthead__logo-container {
+    padding:.3125rem 0 0
+}
+.polyscript-masthead__logo {
+    width:100px;
+    height:auto;
+}
+
+.polyscript-right {
+    float: right;
+}
+
+.polyscript-box {
+    box-sizing: border-box;
+    background: white;
+    border: 1px solid rgba(200, 215, 225, 0.5);
+}
+
+.polyscript-box .polyscript-right {
+    padding-right: 1.5rem;
+}
+
+.polyscript-boxes .polyscript-box {
+    margin-bottom: 0;
+    padding: 0;
+    margin-top: -1px;
+}

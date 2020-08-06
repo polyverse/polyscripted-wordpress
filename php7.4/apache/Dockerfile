@@ -18,7 +18,7 @@ RUN set -ex; \
 	apt-get install -y --no-install-recommends \
 		libfreetype6-dev \
 		libjpeg-dev \
-		netcat \
+		ncat \
 		vim \
 		libmagickwand-dev \
 		libpng-dev \
@@ -115,5 +115,4 @@ COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
 COPY scripts/* $POLYSCRIPT_PATH/
 
-HEALTHCHECK CMD mysqladmin ping --silent
 EXPOSE 80/tcp 
