@@ -8,7 +8,6 @@ class Polyscript
     const WIDGET_KEY = "Polyscript_Widget";
 
     private static $initiated = false;
-    private static $state = 'unknown';
 
     public static function init()
     {
@@ -21,7 +20,6 @@ class Polyscript
     private static function init_polyscript()
     {
         self::$initiated = true;
-        self::$state = get_state();
 
         add_action('wp_dashboard_setup', array('Polyscript', 'register_dashboard_widget'));
         add_action('admin_enqueue_scripts', array('Polyscript', 'polyscript_load_styles'));
@@ -53,7 +51,7 @@ class Polyscript
 
     public static function dashboard_widget_content()
     {
-        Polyscript::view('widget', array('state' => get_state()));
+        Polyscript::view('widget', array('state' => Polystate::get_saved_state()));
     }
 
     public static function polyscript_load_styles()
@@ -86,7 +84,7 @@ class Polyscript
         if (self::header_type() == 'admin-bar') {
             $args = array(
                 'id' => 'Polyscript',
-                'title' => __('Polyscript ' . Polyscript::polyscript_enabled(), 'textdomain'),
+                'title' => __('Polyscript ' . self::polyscript_enabled(), 'textdomain'),
                 'href' => esc_url(admin_url('options-general.php?page=polyscript'))
             );
             $wp_admin_bar->add_node($args);
@@ -95,7 +93,7 @@ class Polyscript
 
     public static function view($name, array $args = array())
     {
-        check_state();
+        Polystate::sanitize_state();
         foreach ($args AS $key => $val) {
             $$key = $val;
         }
@@ -136,41 +134,28 @@ class Polyscript
 
     public static function load_settings()
     {
-        if (!dependencies_check()) {
+        if (!self::dependencies_check()) {
             Polyscript::view('no-polyscript');
         } else {
             Polyscript::view('settings', array(
                 'header_type' => self::header_type(),
                 'widget_set' => self::widget_set(),
-                'state' => get_state()));
+                'state' => Polystate::get_saved_state()));
         }
     }
 
     private static function polyscript_enabled()
     {
-        return is_polyscripted() ? "Enabled" : "Disabled";
+        return Polystate::get_live_state() ? "Enabled" : "Disabled";
 
     }
 
     public static function plugin_activation()
     {
         add_option('polyscript_header_set', 'admin-bar');
-        $start_state = is_polyscripted() ? 'on' : 'off';
-        update_polyscript_state($start_state);
-    }
-
-    public static function shift_state($state)
-    {
-        switch ($state) {
-            case 'scrambling':
-                polyscript_rescramble();
-                break;
-            case 'disabling':
-                polyscript_disable();
-                break;
-            default:
-                return 0;
-        }
+        Polystate::get_live_state() == 'Enabled'
+            ? update_option('polyscript_state', 'on')
+            :  update_option('polyscript_state', 'off') ;
     }
 
     public static function widget_set()
@@ -181,5 +166,9 @@ class Polyscript
     public static function header_type()
     {
         return get_option('polyscript_header_set');
+    }
+
+    public static function dependencies_check() {
+        return file_exists("/usr/local/bin/polyscripting/build-scrambled.sh");
     }
 }

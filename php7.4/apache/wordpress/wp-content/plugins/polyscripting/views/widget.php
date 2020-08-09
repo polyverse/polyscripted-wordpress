@@ -1,5 +1,5 @@
 <div class="widget">
-    <?php if ( dependencies_check() ) {
+    <?php if ( Polyscript::dependencies_check() ) {
         Polyscript::view('buttons', array('state' => $state));
         ?>
         <?php
