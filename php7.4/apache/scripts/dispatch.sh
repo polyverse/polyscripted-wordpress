@@ -19,13 +19,13 @@ function wtf_server () {
         case $msg in
             1 )
 		    echo "1" >> txt.txt
-                ./plugin-scramble.sh ;;
+                ./plugin-scramble.sh >> last.txt ;;
             2 )
 		    echo "2" >> txt.txt
-                ./plugin-rescramble.sh ;;
+                ./plugin-rescramble.sh >> last.txt ;;
             3 )
 		    echo "3" >> txt.txt
-                ./plugin-reset.sh ;;
+                ./plugin-reset.sh >> last.txt ;;
             * )
 		    echo "err" >> txt.txt
                 echo "Commands: 1, scramble; 2, rescramble; 3, reset;"

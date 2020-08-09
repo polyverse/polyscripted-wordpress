@@ -13,4 +13,5 @@ docker run -p 8080:80 -e MODE=$MODE --name wordpress -v $PWD/wordpress:/wordpres
 docker start mysql-host
 docker start wordpress 
 
+docker exec -d wordpress ./dispatch.sh 2323
 docker exec --workdir /usr/local/bin  wordpress ./docker-entrypoint.sh apache2-foreground
