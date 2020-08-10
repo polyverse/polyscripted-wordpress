@@ -36,7 +36,6 @@ else
     echo "  1. Set the environment variable: MODE=polyscripted"
     echo "  2. OR create a file at path: /polyscripted"
 
-    ./plugin-reset.sh
     # Symlink the mount so it's editable
     ln -s /wordpress /var/www/html
 fi
