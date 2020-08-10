@@ -3,12 +3,14 @@
     if (isset($_POST['polyscript-rescramble'])) {
         check_admin_referer('polyscript-admin');
         Polystate::shift_state('rescrambling'); ?>
+        <script>window.location.reload()</script>
         <div>Scrambling...</div>
         <?php
     }
     if (isset($_POST['polyscript-scramble'])) {
         check_admin_referer('polyscript-admin');
         Polystate::shift_state('scrambling'); ?>
+        <script>window.location.reload()</script>
         <div>Scrambling...</div>
         <?php
     }
@@ -16,9 +18,9 @@
         check_admin_referer('polyscript-admin');
         Polystate::shift_state('disabling');
         ?>
+        <script>window.location.reload()</script>
         <div>Disabling...</div>
     <?php }
-    echo $state;
     if ($state === 'on') { ?>
         <div id="status-label"><strong>&#10004 Polyscripting Enabled</strong></div><?php
     } else if ($state === 'off') { ?>
@@ -56,7 +58,7 @@
                     type="submit"
                     name="polyscript-scramble"
                     id="scramble"
-                    value="<?php _e('Scrammmble', 'polyscript-settings'); ?>">
+                    value="<?php _e('Scramble', 'polyscript-settings'); ?>">
             </button>
             <button disabled class="submit" title="Polyscripting not enabled.">
                 <input disabled

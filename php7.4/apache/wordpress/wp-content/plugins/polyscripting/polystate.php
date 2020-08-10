@@ -36,28 +36,34 @@ class Polystate
     static function sanitize_state() {
         $cur_state = self::get_saved_state();
         if ($cur_state == 'on' && !self::is_polyscripted()) {
-            self::signal_state_shift('on');
+            self::signal_state_shift('scrambling');
         } else if ($cur_state == 'off' && self::is_polyscripted()) {
-            self::signal_state_shift('off');
+            self::signal_state_shift('disabling');
         } else if ($cur_state == 'scrambling' && self::is_polyscripted()) {
             self::update_saved_state('on');
         } else if ($cur_state == 'disabling' && !self::is_polyscripted()) {
             self::update_saved_state('off');
         } else if ($cur_state == 'rescrambling' && self::is_polyscripted()) {
             self::check_rescramble_shift();
-        } else if ($cur_state == 'scrambling' || $cur_state == 'rescrambling') {
+        } else if ($cur_state == 'scrambling' || $cur_state == 'disabling') {
             self::check_shift_timeout();
         }
     }
 
     private static function check_shift_timeout() {
-        if ((time() - get_option('polyscript_shift_timestamp', time())) > 100) {
-            //TODO: Add warning.
+        if ((time() - get_option('polyscript_shift_timestamp', time())) > 300) {
+            update_option('polyscript_warning', 'timeout');
             self::update_saved_state(self::get_live_state() ? 'on' : 'off');
         }
     }
 
+    public static function check_warning(){
+        return get_option('polyscript_warning') == 'timeout' || get_option('polyscript_warning') == 'socket_fail';
+    }
 
+    public static function clear_warning(){
+        return delete_option('polyscript_warning');
+    }
 
     public static function shift_state($state)
     {
@@ -73,28 +79,16 @@ class Polystate
                 break;
             default:
                 die ("Unknown Error Reached");
-                return 0;
         }
     }
 
     private static function check_rescramble_shift() {
-        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!$socket) {
-            return false;
+        if (get_option('polyscript_dummy') != hash_file('md5', plugin_dir_path(__FILE__) . 'dummy.php')) {
+            delete_option('polyscript_dummy');
+            self::update_saved_state('on');
+        } else {
+            self::check_shift_timeout();
         }
-        $stream = stream_socket_client("tcp://" . self::$host . ":" . self::$port);
-        if (!$stream) {
-            return false;
-        }
-
-        if ($contents = !fread($stream, 1024))  {
-            return false;
-        }
-
-        die($contents);
-
-        fclose($stream);
-        return true;
     }
 
     private static function update_saved_state($new_state) {
@@ -117,6 +111,7 @@ class Polystate
                 break;
             case 'rescrambling':
                 $signal="2 ";
+                update_option('polyscript_dummy', hash_file('md5', plugin_dir_path(__FILE__) . 'dummy.php'));
                 break;
             case 'disabling':
                 $signal="3 ";
@@ -130,8 +125,8 @@ class Polystate
             update_option('polyscript_shift_timestamp', time());
             return 1;
         } else {
-            die (self::$host);
-            //TODO add warning notification/failure.
+            update_option('polyscript_warning', 'socket_fail');
+            die ("Could not communicate with socket. State shift unavailable.");
         }
 
     }

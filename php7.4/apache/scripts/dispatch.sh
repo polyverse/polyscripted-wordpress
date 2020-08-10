@@ -19,18 +19,25 @@ function wtf_server () {
         case $msg in
             1 )
 		    echo "1" >> txt.txt
-                ./plugin-scramble.sh >> last.txt ;;
+		    export MODE=polyscripted ;;
             2 )
 		    echo "2" >> txt.txt
-                ./plugin-rescramble.sh >> last.txt ;;
+		    ./reset.sh >> txt.txt
+		    export MODE=polyscripted ;;
             3 )
 		    echo "3" >> txt.txt
-                ./plugin-reset.sh >> last.txt ;;
+		    export MODE=off ;;
             * )
+	    	    err='true'
 		    echo "err" >> txt.txt
                 echo "Commands: 1, scramble; 2, rescramble; 3, reset;"
                 echo "    ctrl-c to exit"
         esac
+	if ! [ $err = 'true'  ]; then
+		scramble.sh > last.txt
+		service apache2 restart >> txt.txt
+		$err='false'
+	fi
 	echo "done" >> txt.txt
         echo -n "> "
     done
@@ -44,4 +51,3 @@ coproc WTF { wtf_server; }
 # Start a netcat server, with its stdin redirected from WTF's stdout,
 # and its stdout redirected to WTF's stdin
 nc -v -l -p $port -k <&${WTF[0]} >&${WTF[1]}
-

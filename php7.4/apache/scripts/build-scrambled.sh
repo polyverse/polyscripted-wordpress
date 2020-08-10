@@ -24,3 +24,7 @@ $PHP_EXEC/s_php tok-php-transformer.php -p ./phar.php --replace
 mv ./phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
 cd $PHP_SRC_PATH; make -o ext/phar/phar.php install -k; cd $POLYSCRIPT_PATH;
+
+cp /usr/local/bin/polyscripting/vanilla-save/zend_language_scanner.l $PHP_SRC_PATH/Zend/zend_language_scanner.l
+cp  /usr/local/bin/polyscripting/vanilla-save/zend_language_parser.y $PHP_SRC_PATH/Zend/zend_language_parser.y
+cp /usr/local/bin/polyscripting/vanilla-save/phar.php $PHP_SRC_PATH/ext/phar/phar.php
