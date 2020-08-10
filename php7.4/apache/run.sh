@@ -149,7 +149,7 @@ if [[ "$HOSTPORT" == "" ]]; then
         echo "No host port env variable found, defaulting to port 8000."
         HOSTPORT=8000
 fi
-wpcmd="docker run --rm -e MODE=$MODE --name wordpress -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-$headsha"
+wpcmd="docker run -t -d -e MODE=$MODE --name wordpress -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-$headsha bash"
 if [[ "$*" == "-f" ]]
 then
     echo "YES"
@@ -162,7 +162,10 @@ echo ""
 while true; do
     read -p "Do you wish to continue?" yn
     case $yn in
-        [Yy]* ) eval $wpcmd; exit;;
+        [Yy]* ) eval $wpcmd; 
+		docker exec -d wordpress ./dispatch.sh 2323;
+		docker exec --workdir /usr/local/bin  wordpress ./docker-entrypoint.sh apache2-foreground; 
+		exit;;
         [Nn]* ) echo "Not starting wordpress."; exit;;
         * ) echo "Please answer yes or no.";;
     esac

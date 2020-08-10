@@ -22,7 +22,6 @@ function wtf_server () {
 		    export MODE=polyscripted ;;
             2 )
 		    echo "2" >> txt.txt
-		    ./reset.sh >> txt.txt
 		    export MODE=polyscripted ;;
             3 )
 		    echo "3" >> txt.txt
@@ -33,10 +32,10 @@ function wtf_server () {
                 echo "Commands: 1, scramble; 2, rescramble; 3, reset;"
                 echo "    ctrl-c to exit"
         esac
-	if ! [ $err = 'true'  ]; then
+	if ! [[ $err = 'true'  ]]; then
 		scramble.sh > last.txt
 		service apache2 restart >> txt.txt
-		$err='false'
+		err='false'
 	fi
 	echo "done" >> txt.txt
         echo -n "> "
