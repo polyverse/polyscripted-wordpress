@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2020 Polyverse Corporation
- 
+
 test -n "$1" || { echo "$0 <port>"; exit 1; }
 port=$1
 
@@ -24,8 +24,9 @@ function poly-dispatcher () {
                 echo "    ctrl-c to exit"
         esac
 	if ! [[ $err = 'true'  ]]; then
-		scramble.sh > dispatcher-out.logs
-		service apache2 restart >> dispatcher-in.logs
+		scramble.sh >& /usr/local/bin/polyscripting/to_main_process
+		service apache2 stop >& /usr/local/bin/polyscripting/to_main_process
+		/usr/local/bin/tini -s -- "apache2-foreground" >& /usr/local/bin/polyscripting/to_main_process &
 		err='false'
 	fi
 	echo "done" >> dispatcher-in.logs
@@ -33,7 +34,7 @@ function poly-dispatcher () {
     done
     echo "complete" >> dispatcher-in.logs
 }
- 
+
 coproc proc_dispatcher { poly-dispatcher; }
- 
+
 nc -v -l -p $port -k <&${proc_dispatcher[0]} >&${proc_dispatcher[1]}

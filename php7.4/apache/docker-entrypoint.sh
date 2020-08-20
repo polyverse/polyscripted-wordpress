@@ -304,8 +304,15 @@ if [ -f "/usr/local/bin/s_php" ]; then
     rm -rf /usr/local/bin/s_php
 fi
 
-echo "Forking off dispatcher and running $@..."
-/usr/local/bin/polyscripting/dispatch.sh 2323 &
-/usr/local/bin/tini -s -- "$@" &
+# Get all child processes to send data to us such that we can
+# print restarted apache output to stdout
 
-sleep infinity
+mkfifo /usr/local/bin/polyscripting/to_main_process
+
+echo "Forking off dispatcher and running $@..."
+/usr/local/bin/polyscripting/dispatch.sh 2323 >& /usr/local/bin/polyscripting/to_main_process &
+/usr/local/bin/tini -s -- "$@" >& /usr/local/bin/polyscripting/to_main_process &
+
+# Infinite wait and print to stdout
+echo "Capturing dispatcher and apache output to stdout..."
+while true; do cat /usr/local/bin/polyscripting/to_main_process; done
