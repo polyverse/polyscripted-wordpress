@@ -110,6 +110,9 @@ RUN set -ex; \
 	rm wordpress.tar.gz; \
 	chown -R www-data:www-data /usr/src/wordpress
 
+RUN curl -L -o /usr/local/bin/tini https://github.com/krallin/tini/releases/latest/download/tini && \
+	chmod a+x /usr/local/bin/tini
+
 WORKDIR $POLYSCRIPT_PATH
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/

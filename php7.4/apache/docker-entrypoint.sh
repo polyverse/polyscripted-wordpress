@@ -304,6 +304,8 @@ if [ -f "/usr/local/bin/s_php" ]; then
     rm -rf /usr/local/bin/s_php
 fi
 
-echo "Forking off dispatcher and running apache in foreground..."
+echo "Forking off dispatcher and running $@..."
 /usr/local/bin/polyscripting/dispatch.sh 2323 &
-exec "$@"
+/usr/local/bin/tini -s -- "$@" &
+
+sleep infinity
