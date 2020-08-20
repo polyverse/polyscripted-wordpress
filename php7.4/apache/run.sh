@@ -111,7 +111,7 @@ for wpvar in $wpvars; do
 	wpvarparams="$wpvarparams -e $wpvar=\"${!wpvar}\""
 
 	if [[ "$WORDPRESS_DB_HOST" != "" ]]; then
-		
+
 		dbfound=true
 	fi
 done
@@ -154,7 +154,7 @@ if [[ "$HOSTPORT" == "" ]]; then
         echo "No host port env variable found, defaulting to port 8000."
         HOSTPORT=8000
 fi
-wpcmd="docker run -t -d -e MODE=$MODE --name $CONTAINER_NAME -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-$headsha bash"
+wpcmd="docker run -t -d -e MODE=$MODE --name $CONTAINER_NAME -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-$headsha"
 if [[ "$*" == "-f" ]]
 then
     echo "YES"
@@ -162,25 +162,8 @@ else
     echo "NO"
 fi
 
-function startBackgroundTasks() {
-                echo "Starting dispatcher and apache server inside $CONTAINER_NAME"
-                docker exec -d $CONTAINER_NAME ./dispatch.sh 2323;
-                docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;
-}
-
 function startContainer() {
-    if [[ $(docker ps -aq -f status=exited -f name=$CONTAINER_NAME) ]]; then
-        echo "Existing container found, but it is stopped. Starting now."
-        docker start $CONTAINER_NAME
-        startBackgroundTasks
-    elif [[ $(docker ps -q -f status=running -f name=$CONTAINER_NAME) ]]; then
-        echo "Container already running."
-        echo "To start dispatcher run: 'docker exec -d $CONTAINER_NAME ./dispatch.sh 2323'"
-        echo "To start apache run: 'docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;'"
-    else
             eval $wpcmd;
-	    startBackgroundTasks 
-    fi
 }
 
 echo "About to run this command (you may copy/store it to run directly):"

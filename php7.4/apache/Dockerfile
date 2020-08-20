@@ -115,4 +115,6 @@ COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
 COPY scripts/* $POLYSCRIPT_PATH/
 
-EXPOSE 80/tcp 
+# apache2-foreground comes from inherited container's CMD, which we chain
+CMD ["docker-entrypoint.sh", "apache2-foreground"]
+EXPOSE 80/tcp
