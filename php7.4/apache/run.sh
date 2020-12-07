@@ -162,6 +162,23 @@ else
     echo "NO"
 fi
 
+function startBackgroundTasks() {
+if [[ $PLUGIN != "true" ]]; then 
+	while true; do
+		read -p "Do you want to start dispatcher for the polyscripting plugin to allow scrambling from the wordpress plugin?"
+		case $yn in
+			[Yy]* ) docker exec -d $CONTAINER_NAME ./dispatch.sh 2323; echo "Set PLUGIN to true to skip this prompt."; break;;
+			[Nn]* ) echo "To enable dispatcher in the future run: docker exec -d $CONTAINER_NAME ./dispatch.sh 2323; break;;"; break;;
+			* ) echo "Please answer yes or no.";;
+		esac
+	done
+else
+	docker exec -d $CONTAINER_NAME ./dispatch.sh 2323;
+fi
+	echo "Starting apache server inside $CONTAINER_NAME"
+        docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;
+}
+
 function startContainer() {
             eval $wpcmd;
 }
