@@ -1,52 +1,40 @@
 #!/bin/bash
- 
-# Weird little TCP server
-# Tells time and uptime; can list and dump files in an "docs" subdir
- 
-# Takes a port parameter, just so you know which one you're running on.
+# Copyright (c) 2020 Polyverse Corporation
+
 test -n "$1" || { echo "$0 <port>"; exit 1; }
 port=$1
-dir=`dirname $0`
-docs=$dir/docs
 
-echo "start" >> txt.txt
-
-function wtf_server () {
-	echo "Enter" >> txt.txt
+function poly-dispatcher () {
     while true ; do
-	    echo "While" >> txt.txt
     read -d ' ' msg
         case $msg in
             1 )
-		    echo "1" >> txt.txt
+		    echo "1" >> dispatcher-in.logs
 		    export MODE=polyscripted ;;
             2 )
-		    echo "2" >> txt.txt
+		    echo "2" >> dispatcher-in.logs
 		    export MODE=polyscripted ;;
             3 )
-		    echo "3" >> txt.txt
+		    echo "3" >> dispatcher-in.logs
 		    export MODE=off ;;
             * )
 	    	    err='true'
-		    echo "err" >> txt.txt
+		    echo "err" >> dispatcher-in.logs
                 echo "Commands: 1, scramble; 2, rescramble; 3, reset;"
                 echo "    ctrl-c to exit"
         esac
 	if ! [[ $err = 'true'  ]]; then
-		scramble.sh > last.txt
-		service apache2 restart >> txt.txt
+		scramble.sh >& /usr/local/bin/polyscripting/to_main_process
+		service apache2 stop >& /usr/local/bin/polyscripting/to_main_process
+		/usr/local/bin/tini -s -- "apache2-foreground" >& /usr/local/bin/polyscripting/to_main_process &
 		err='false'
 	fi
-	echo "done" >> txt.txt
+	echo "done" >> dispatcher-in.logs
         echo -n "> "
     done
-    echo "complete" >> txt.txt
+    echo "complete" >> dispatcher-in.logs
 }
- 
-# Start wtf_server as a background coprocess named WTF
-# Its stdin filehandle is ${WTF[1]}, and its stdout is ${WTF[0]}
-coproc WTF { wtf_server; }
- 
-# Start a netcat server, with its stdin redirected from WTF's stdout,
-# and its stdout redirected to WTF's stdin
-nc -v -l -p $port -k <&${WTF[0]} >&${WTF[1]}
+
+coproc proc_dispatcher { poly-dispatcher; }
+
+nc -v -l -p $port -k <&${proc_dispatcher[0]} >&${proc_dispatcher[1]}
