@@ -12,7 +12,7 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 
 	echo "Starting polyscripted WordPress"
 	cd $POLYSCRIPT_PATH
-	sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
+	#sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
     	./build-scrambled.sh
 	if [ -f scrambled.json ] && s_php tok-php-transformer.php -p /var/www/temp --replace; then
 		rm -rf /var/www/html

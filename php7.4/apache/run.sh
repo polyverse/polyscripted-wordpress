@@ -5,7 +5,7 @@
 # 80-character wide dashes for intermittent use
 # echo "--------------------------------------------------------------------------------"
 
-CONTAINER_NAME=wordpress
+CONTAINER_NAME=wordpress5
 
 function getContainerHealth {
   docker inspect --format "{{.State.Health.Status}}" $1
@@ -152,7 +152,7 @@ if [[ "$CONTAINERPORT" == "" ]]; then
 fi
 if [[ "$HOSTPORT" == "" ]]; then
         echo "No host port env variable found, defaulting to port 8000."
-        HOSTPORT=8000
+        HOSTPORT=8180
 fi
 wpcmd="docker run -t -d -e MODE=$MODE --name $CONTAINER_NAME -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-$headsha bash"
 if [[ "$*" == "-f" ]]
@@ -163,9 +163,20 @@ else
 fi
 
 function startBackgroundTasks() {
-                echo "Starting dispatcher and apache server inside $CONTAINER_NAME"
-                docker exec -d $CONTAINER_NAME ./dispatch.sh 2323;
-                docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;
+if [[ $PLUGIN != "true" ]];
+	while true; do
+		read -p "Do you want to start dispatcher for the polyscripting plugin to allow scrambling from the wordpress plugin?"
+		case $yn in
+			[Yy]* ) docker exec -d $CONTAINER_NAME ./dispatch.sh 2323; echo "Set PLUGIN to true to skip this prompt."; break;;
+			[Nn]* ) echo "If you'd like to start dispatcher in the future run: \n docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;"
+			* ) echo "Please answer yes or no.";;
+		esac
+	done
+else
+	docker exec -d $CONTAINER_NAME ./dispatch.sh 2323; break;;
+fi
+	echo "Starting apache server inside $CONTAINER_NAME"
+        docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;
 }
 
 function startContainer() {

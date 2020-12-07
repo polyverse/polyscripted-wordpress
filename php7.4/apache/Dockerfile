@@ -110,7 +110,7 @@ RUN set -ex; \
 	rm wordpress.tar.gz; \
 	chown -R www-data:www-data /usr/src/wordpress
 
-WORKDIR $POLYSCRIPT_PATH
+RUN rm -rf $POLYSCRIPT_PATH
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
 COPY scripts/* $POLYSCRIPT_PATH/
