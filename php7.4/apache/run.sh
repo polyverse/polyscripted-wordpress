@@ -152,7 +152,7 @@ if [[ "$CONTAINERPORT" == "" ]]; then
 fi
 if [[ "$HOSTPORT" == "" ]]; then
         echo "No host port env variable found, defaulting to port 8000."
-        HOSTPORT=8180
+        HOSTPORT=8000
 fi
 wpcmd="docker run -t -d -e MODE=$MODE --name $CONTAINER_NAME -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-$headsha bash"
 if [[ "$*" == "-f" ]]
