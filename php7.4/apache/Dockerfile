@@ -19,16 +19,19 @@ RUN set -ex; \
 	apt-get install -y --no-install-recommends \
 		libfreetype6-dev \
 		libjpeg-dev \
+		ncat \
 		vim \
 		libmagickwand-dev \
 		libpng-dev \
 		libzip-dev \
 	; \
 	\
+	php -i; \
 	docker-php-ext-configure gd --with-freetype --with-jpeg; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \
+		sockets \
 		gd \
 		mysqli \
 		opcache \
@@ -108,9 +111,14 @@ RUN set -ex; \
 	rm wordpress.tar.gz; \
 	chown -R www-data:www-data /usr/src/wordpress
 
+RUN curl -L -o /usr/local/bin/tini https://github.com/krallin/tini/releases/latest/download/tini && \
+	chmod a+x /usr/local/bin/tini
+
 WORKDIR $POLYSCRIPT_PATH
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
+COPY scripts/* $POLYSCRIPT_PATH/
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
+# apache2-foreground comes from inherited container's CMD, which we chain
+CMD ["docker-entrypoint.sh", "apache2-foreground"]
+EXPOSE 80/tcp
