@@ -49,7 +49,7 @@ RUN set -ex; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --virtual .wordpress-phpexts-rundeps $runDeps; 
+	apk add --virtual .wordpress-phpexts-rundeps $runDeps;
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -79,8 +79,8 @@ WORKDIR $PHP_SRC_PATH
 RUN make install
 #VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION 5.2.3
-ENV WORDPRESS_SHA1 5efd37148788f3b14b295b2a9bf48a1a467aa303
+ENV WORDPRESS_VERSION 5.6
+ENV WORDPRESS_SHA1 db8b75bfc9de27490434b365c12fd805ca6784ce
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \

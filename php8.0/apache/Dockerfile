@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.4-apache:6884ddcae2191a0c818ed38999198e0dc0ca37b4
+FROM polyverse/ps-php8.0-apache:2a205de035e60723d403d5bab3ca5974f1e9d6be
 
 # persistent dependencies
 RUN set -eux; \
@@ -20,6 +20,7 @@ RUN set -ex; \
 		libjpeg-dev \
 		ncat \
 		vim \
+		git \
 		libmagickwand-dev \
 		libpng-dev \
 		libzip-dev \
@@ -36,7 +37,16 @@ RUN set -ex; \
 		opcache \
 		zip \
 	; \
-	pecl install imagick-3.4.4; \
+	# Thanks to: https://github.com/Imagick/imagick/issues/331#issuecomment-743271207
+	# Enable the line below once it's on PECL
+	# pecl install imagick-3.4.4; \
+	# Until then, we're going to install from source!
+	cd /opt; \
+	git clone https://github.com/Imagick/imagick; \
+	cd imagick; \
+	phpize && ./configure; \
+	make; \
+	make install; \
 	docker-php-ext-enable imagick; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
