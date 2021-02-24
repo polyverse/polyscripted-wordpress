@@ -1,4 +1,12 @@
 #!/bin/bash
+if [ -d /var/www/html ]; then
+	echo "A mounted/previous directory /var/www/html exists. We will be replacing it with polyscripted code,"
+	echo "at least once if not more. Moving the directory to /var/www/html.original to avoid touching it."
+	echo "As of the building of this image, moving a mounted directory in a Docker Container still kept it"
+	echo "mounted so this should be okay."
+
+	mv /var/www/html /var/www/html.original
+fi
 
 if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 
@@ -11,11 +19,9 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 	fi
 
 	echo "Starting polyscripted WordPress"
-	cd $POLYSCRIPT_PATH
 	sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
     	./build-scrambled.sh
 	if [ -f scrambled.json ] && s_php tok-php-transformer.php -p /var/www/temp --replace; then
-		rm -rf /var/www/html
 		mv /var/www/temp /var/www/html
 		echo "Polyscripting enabled."
 		echo "done"
@@ -24,11 +30,11 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 		cp /usr/local/bin/s_php /usr/local/bin/php
 		exit 1
 	fi
-	
+
 	rm  -rf /var/www/html/wp-content/uploads
 	if [ -d /uploads ]; then
 		ln -s /uploads /var/www/html/wp-content/uploads
-	else 	
+	else
 		ln -s /wordpress/wp-content/uploads /var/www/html/wp-content/uploads
 	fi
 else
@@ -36,10 +42,10 @@ else
     echo "  1. Set the environment variable: MODE=polyscripted"
     echo "  2. OR create a file at path: /polyscripted"
 
-        
 
-    if [ -d $POLYSCRIPT_PATH/vanilla-save ]; then
-	    $POLYSCRIPT_PATH/reset.sh
+
+    if [ -d vanilla-save ]; then
+	    reset.sh
     fi
     # Symlink the mount so it's editable
     rm -rf /var/www/html

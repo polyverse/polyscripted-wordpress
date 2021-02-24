@@ -294,9 +294,9 @@ EOPHP
 		unset "$e"
 	done
 
-	if [ -e /usr/local/bin/scramble.sh ]; then
+	if [ -e $POLYSCRIPT_PATH/scramble.sh ]; then
 		echo "Scrambler script found. Calling it..."
-		/usr/local/bin/scramble.sh
+		$POLYSCRIPT_PATH/scramble.sh
 	fi
 fi
 
