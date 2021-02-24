@@ -20,7 +20,7 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 
 	echo "Starting polyscripted WordPress"
 	sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
-    	./build-scrambled.sh
+    	$POLYSCRIPT_PATH/build-scrambled.sh
 	if [ -f scrambled.json ] && s_php tok-php-transformer.php -p /var/www/temp --replace; then
 		rm -rf /var/www/html
 		mv /var/www/temp /var/www/html
@@ -43,8 +43,8 @@ else
     echo "  1. Set the environment variable: MODE=polyscripted"
     echo "  2. OR create a file at path: /polyscripted"
 
-    if [ -d vanilla-save ]; then
-	    reset.sh
+    if [ -d $POLYSCRIPT_PATH/vanilla-save ]; then
+	    $POLYSCRIPT_PATH/reset.sh
     fi
     # Symlink the mount so it's editable
     rm -rf /var/www/html

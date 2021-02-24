@@ -6,7 +6,7 @@ if [ ! -v PHP_EXEC ]; then
 fi
 
 if [ ! -f "${PHP_EXEC}/s_php" ]; then
-     cp -o $PHP_EXEC/php $PHP_EXEC/s_php
+     cp -p $PHP_EXEC/php $PHP_EXEC/s_php
 fi
 
 if [ ! -d "${POLYSCRIPT_PATH}/vanilla-save" ]; then
@@ -16,12 +16,12 @@ if [ ! -d "${POLYSCRIPT_PATH}/vanilla-save" ]; then
     cp -p $PHP_SRC_PATH/ext/phar/phar.php /usr/local/bin/polyscripting/vanilla-save/phar.php
 fi
 
-./php-scrambler
+$POLYSCRIPT_PATH//php-scrambler
 
 cp -p $PHP_SRC_PATH/ext/phar/phar.php .
 
-$PHP_EXEC/s_php tok-php-transformer.php -p ./phar.php --replace
-mv ./phar.php $PHP_SRC_PATH/ext/phar/phar.php
+$PHP_EXEC/s_php tok-php-transformer.php -p $POLYSCRIPT_PATH//phar.php --replace
+mv $POLYSCRIPT_PATH//phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
 cd $PHP_SRC_PATH; make -o ext/phar/phar.php install -k; cd $POLYSCRIPT_PATH;
 
