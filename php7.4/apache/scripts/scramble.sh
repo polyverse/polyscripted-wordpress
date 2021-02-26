@@ -1,14 +1,15 @@
 #!/bin/bash
 
-echo "!!!!!!!!!!Hello World!!!!!!!!!!"
+if [ "$(ls -A /var/www/html)" ]; then
+	echo "The directory /var/www/html is non-empty. This is unexpected and dangerous for this container."
+	echo "This container expects Wordpress (or the PHP app) at location '/wordpress' which will then be"
+	echo "properly provided at /var/www/html either directly or polyscripted."
+	echo ""
+	echo "To avoid destroying your code, aboring this container."
 
-if [ -d /var/www/html ]; then
-	echo "A mounted/previous directory /var/www/html exists. We will be replacing it with polyscripted code,"
-	echo "at least once if not more. Moving the directory to /var/www/html.original to avoid touching it."
-	echo "As of the building of this image, moving a mounted directory in a Docker Container still kept it"
-	echo "mounted so this should be okay."
-
-	mv /var/www/html /var/www/html.original
+	exit 1
+else
+	rm -rf /var/www/html
 fi
 
 if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
@@ -36,12 +37,10 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 		exit 1
 	fi
 
-	rm  -rf /var/www/html/wp-content/uploads
-	if [ -d /uploads ]; then
-		ln -s /uploads /var/www/html/wp-content/uploads
-	else
-		ln -s /wordpress/wp-content/uploads /var/www/html/wp-content/uploads
-	fi
+	echo "Removing /var/www/html/wp-content/uploads (since it was deep-copied)..."
+	echo "Don't worry it will be mounted properly in a moment."
+	rm -rf /var/www/html/wp-content/uploads
+
 else
     echo "Polyscripted mode is off. To enable it, either:"
     echo "  1. Set the environment variable: MODE=polyscripted"
@@ -50,8 +49,23 @@ else
     if [ -d $POLYSCRIPT_PATH/vanilla-save ]; then
 	    $POLYSCRIPT_PATH/reset.sh
     fi
+
     # Symlink the mount so it's editable
-    rm -rf /var/www/html
     ln -s /wordpress /var/www/html
 fi
 
+if [ -d /var/www/html/wp-content/uploads ]; then
+	echo "Directory for uploads /var/www/html/wp-content/uploads exists. Doing nothing."
+else
+	echo "Directory for uploads /var/www/html/wp-content/uploads does not exist. Looking to mount it..."
+	if [ -d /uploads ]; then
+		echo "Uploads mounted at /uploads so symlinking that to /var/www/html/wp-content/uploads"
+		ln -s /uploads /var/www/html/wp-content/uploads
+	else
+		if [ ! -d /wordpress/wp-content/uploads ]; then
+			echo "Creating a directory for uploads at: /wordpress/wp-content/uploads"
+		fi
+		echo "Symlinking /wordpress/wp-content/uploads to /var/www/html/wp-content/uploads for persistent uploads"
+		ln -s /wordpress/wp-content/uploads /var/www/html/wp-content/uploads
+	fi
+fi
