@@ -64,8 +64,16 @@ else
 	else
 		if [ ! -d /wordpress/wp-content/uploads ]; then
 			echo "Creating a directory for uploads at: /wordpress/wp-content/uploads"
+			mkdir /wordpress/wp-content/uploads
 		fi
-		echo "Symlinking /wordpress/wp-content/uploads to /var/www/html/wp-content/uploads for persistent uploads"
-		ln -s /wordpress/wp-content/uploads /var/www/html/wp-content/uploads
+
+		if [ -d /var/www/html/wp-content/uploads ]; then
+			echo "/var/www/html/wp-content/uploads exists now."
+			echo "/wordpress is probably already symlinked to /var/www/html (encapsulating /wordpress/wp-content/uploads with it)"
+		else
+			echo "Symlinking /wordpress/wp-content/uploads to /var/www/html/wp-content/uploads for persistent uploads"
+			ln -s /wordpress/wp-content/uploads /var/www/html/wp-content/uploads
+		fi
+
 	fi
 fi

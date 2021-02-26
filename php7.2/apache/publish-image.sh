@@ -6,10 +6,19 @@ echo "$(date) Obtaining current git sha for tagging the docker image"
 headsha=$(git rev-parse --verify HEAD)
 
 
-docker build -t $image:debian-$headsha .
-docker tag $image:debian-$headsha $image:debian
+echo "Copying scripts into current directory for docker build context..."
+cp -Rp ../../scripts .
+
+
+docker build -t $image:apache-7.2-$headsha .
+docker tag $image:apache-7.2-$headsha $image:apache-7.2
+docker tag $image:apache-7.2-$headsha $image:latest
 
 if [[ "$1" == "-p" ]]; then
-	docker push $image:debian-$headsha
-	docker push $image:debian
+	docker push $image:apache-7.2-$headsha
+	docker push $image:apache-7.2
+	docker push $image:latest
 fi
+
+echo "Removing temporary scripts"
+rm -rf ./scripts

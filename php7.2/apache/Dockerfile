@@ -96,10 +96,12 @@ RUN set -ex; \
 	rm wordpress.tar.gz; \
 	chown -R www-data:www-data /usr/src/wordpress
 
+RUN curl -L -o /usr/local/bin/tini https://github.com/krallin/tini/releases/latest/download/tini && \
+	chmod a+x /usr/local/bin/tini
+
 WORKDIR $POLYSCRIPT_PATH
-COPY docker-entrypoint.sh /usr/local/bin/
-COPY scramble.sh /usr/local/bin/
+COPY scripts/* $POLYSCRIPT_PATH/
 
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
+# apache2-foreground comes from inherited container's CMD, which we chain
+ENTRYPOINT ["/usr/local/bin/tini", "-g", "--", "bash", "-c"]
+CMD ["$POLYSCRIPT_PATH/docker-entrypoint.sh apache2-foreground"]
