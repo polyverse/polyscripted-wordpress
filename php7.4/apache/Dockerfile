@@ -117,6 +117,6 @@ WORKDIR $POLYSCRIPT_PATH
 COPY scripts/* $POLYSCRIPT_PATH/
 
 # apache2-foreground comes from inherited container's CMD, which we chain
-ENTRYPOINT ["/usr/local/bin/tini", "-g", "--", "sh", "-c"]
+ENTRYPOINT ["/usr/local/bin/tini", "-g", "--", "bash", "-c"]
 CMD ["$POLYSCRIPT_PATH/docker-entrypoint.sh apache2-foreground"]
 EXPOSE 80/tcp

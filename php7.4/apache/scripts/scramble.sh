@@ -1,4 +1,7 @@
 #!/bin/bash
+
+echo "!!!!!!!!!!Hello World!!!!!!!!!!"
+
 if [ -d /var/www/html ]; then
 	echo "A mounted/previous directory /var/www/html exists. We will be replacing it with polyscripted code,"
 	echo "at least once if not more. Moving the directory to /var/www/html.original to avoid touching it."
