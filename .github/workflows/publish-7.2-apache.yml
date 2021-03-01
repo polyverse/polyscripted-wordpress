@@ -1,4 +1,4 @@
-name: Publish 7.4 Apache Image 
+name: Publish 7.2 Apache Image 
 on: 
   push:
     paths: 
