@@ -21,6 +21,7 @@ if [[ "$1" == "-p" ]]; then
 fi
 
 if [[ "$1" == "-g" ]]; then
+	echo "Pushing to Github Container Repository"
 	docker tag $image:apache-7.2-$headsha ghcr.io/$image:apache-7.2-$headsha
 	docker push ghcr.io/$image:apache-7.2-$headsha
 fi
