@@ -20,5 +20,10 @@ if [[ "$1" == "-p" ]]; then
 	docker push $image:latest
 fi
 
+if [[ "$1" == "-g" ]]; then
+	docker tag $image:apache-7.2-$headsha ghcr.io/$image:apache-7.2-$headsha
+	docker push ghcr.io/$image:apache-7.2-$headsha
+fi
+
 echo "Removing temporary scripts"
 rm -rf ./scripts
