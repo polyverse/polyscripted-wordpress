@@ -12,7 +12,7 @@ services:
         driver: none
 
   php-fpm:
-    image: polyverse/polyscripted-wordpress:alpine-$headsha
+    image: polyverse/polyscripted-wordpress:alpine-7.2
     networks: [wordpress]
     volumes: 
         - ./wordpress:/wordpress
