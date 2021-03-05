@@ -3,15 +3,16 @@ on:
   push:
     paths: 
       - 'php7.2/apache/**'
-  workflow_dispatch:
 jobs:
     build:
       runs-on: ubuntu-latest
       steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Build
+        run: ./publish-image.sh
       - name: Test 7.2 WordPress Image
-        run: ./publish-image.sh; ./run-self-contained.sh --test
+        run: ./run-self-contained.sh --test
         shell: bash
         working-directory: ./php7.2/apache/
       - uses: docker/login-action@v1
