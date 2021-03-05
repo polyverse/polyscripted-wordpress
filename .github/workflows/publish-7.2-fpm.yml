@@ -10,7 +10,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Build Image
-        run: publish-image.sh
+        run: ./publish-image.sh
         working-directory: ./php7.2/fpm-alpine/
       - name: Test 7.2 WordPress Image
         run: ./run-self-contained.sh --test
