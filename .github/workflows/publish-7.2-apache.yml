@@ -4,8 +4,6 @@ on:
     paths: 
       - 'php7.2/apache/**'
   workflow_dispatch:
-    tags:
-      description: Manual Test Run
 jobs:
     build:
       runs-on: ubuntu-latest
