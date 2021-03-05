@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Build
-        run: publish-image.sh
+        run: ./publish-image.sh
         working-directory: ./php8.0/apache/
       - name: Test 8.0 WordPress Image
         run: ./run-self-contained.sh --test
