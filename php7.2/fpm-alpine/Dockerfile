@@ -90,13 +90,12 @@ RUN set -ex; \
 	rm wordpress.tar.gz; \
 	chown -R www-data:www-data /usr/src/wordpress
 
-
-RUN curl -L -o /usr/local/bin/tini https://github.com/krallin/tini/releases/latest/download/tini && \
-	chmod a+x /usr/local/bin/tini
+RUN apk add --no-cache tini; \
+        mv /sbin/tini /usr/local/bin/tini
 
 WORKDIR $POLYSCRIPT_PATH
 COPY scripts/* $POLYSCRIPT_PATH/
 
-# apache2-foreground comes from inherited container's CMD, which we chain
 ENTRYPOINT ["/usr/local/bin/tini", "-g", "--", "bash", "-c"]
 CMD ["$POLYSCRIPT_PATH/docker-entrypoint.sh php-fpm"]
+# apache2-foreground comes from inherited container's CMD, which we chain

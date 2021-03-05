@@ -20,7 +20,13 @@ function try_curl {
         fail "Unable to connect to WordPress after $n attempts."
       fi
     }
+  echo "Curled wordpress success. Testing polyscripted"
   done
+}
+
+function start {
+	docker run --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
+        docker run --rm -e MODE=$MODE --name wordpress -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80  polyverse/polyscripted-wordpress:apache-7.2-$headsha
 }
 
 echo "Running under mode: $MODE"
@@ -30,14 +36,12 @@ headsha=$(git rev-parse --verify HEAD)
 
 if [[ "$1" == "-test" ]]; then
 	set -e
-	docker run --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-	docker run --rm -e MODE="polyscripted" --name wordpress -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80  polyverse/polyscripted-wordpress:apache-7.2-$headsha & 
+	$MODE=polyscripted
+	start
 	sleep 55
 	try_curl
-	echo "Curled wordpress success. Testing polyscripted"
 	docker exec -t wordpress /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) && ! $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 else 
-	docker run --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-	docker run --rm -e MODE=$MODE --name wordpress -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80  polyverse/polyscripted-wordpress:apache-7.2-$headsha
+	start
 fi
 
