@@ -3,6 +3,7 @@ on:
   push:
     paths: 
       - 'php7.2/apache/**'
+  workflow_dispatch:
 jobs:
     build:
       runs-on: ubuntu-latest
