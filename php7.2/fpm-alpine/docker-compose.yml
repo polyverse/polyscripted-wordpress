@@ -12,7 +12,8 @@ services:
         driver: none
 
   php-fpm:
-    image: polyverse/polyscripted-wordpress:alpine-$headsha
+    container_name: wordpress
+    image: polyverse/polyscripted-wordpress:alpine-7.2-$headsha
     networks: [wordpress]
     volumes: 
         - ./wordpress:/wordpress

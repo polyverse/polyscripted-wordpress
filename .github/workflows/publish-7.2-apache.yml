@@ -1,4 +1,4 @@
-name: Publish 7.4 Apache Image 
+name: Publish 7.2 Apache Image 
 on: 
   push:
     paths: 
@@ -9,7 +9,14 @@ jobs:
       steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - uses: azure/docker-login@v1
+      - name: Build
+        run: ./publish-image.sh
+        working-directory: ./php7.2/apache/
+      - name: Test 7.2 WordPress Image
+        run: ./run-self-contained.sh --test
+        shell: bash
+        working-directory: ./php7.2/apache/
+      - uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -17,12 +24,12 @@ jobs:
         run: ./publish-image.sh -p
         shell: bash
         working-directory: ./php7.2/apache/
-      - uses: azure/docker-login@v1
+      - uses: docker/login-action@v1
         with:
-          login-server: docker.pkg.github.com
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
       - name: Publish 7.2 Git Package Repository
         run: ./publish-image.sh -g
         shell: bash
-        working-directory: ./php7.2/apache/ 
+        working-directory: ./php7.2/apache/
