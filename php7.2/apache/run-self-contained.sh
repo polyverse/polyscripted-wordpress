@@ -36,7 +36,7 @@ headsha=$(git rev-parse --verify HEAD)
 
 if [[ "$1" == "-test" ]]; then
 	set -e
-	$MODE=polyscripted
+	MODE=polyscripted
 	start
 	sleep 55
 	try_curl
