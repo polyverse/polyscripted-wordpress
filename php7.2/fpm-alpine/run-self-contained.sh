@@ -33,10 +33,10 @@ function try_curl {
 	echo "Curled wordpress success. Testing polyscripted"
 }
 
-if [[ "$1" == "-test" ]]; then
+if [[ "$1" == "--test" ]]; then
         set -e
 	MODE=polyscripted
-	start 
+	start & 
 	sleep 55
         try_curl
         docker exec -t wordpress /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) && ! $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'

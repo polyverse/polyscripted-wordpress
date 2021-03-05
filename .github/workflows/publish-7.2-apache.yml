@@ -27,6 +27,6 @@ jobs:
         shell: bash
         working-directory: ./php7.2/apache/
       - name: Test 7.2 WordPress Image
-        run: ./run-self-contained.sh -test
+        run: ./run-self-contained.sh --test
         shell: bash
         working-directory: ./php7.2/apache/
