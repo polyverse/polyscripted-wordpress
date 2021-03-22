@@ -3,6 +3,8 @@ on:
   push:
     paths: 
       - 'php7.4/apache/**'
+  repository_dispatch:          
+   type: [build_7.4]    
 jobs:
     build:
       runs-on: ubuntu-latest
