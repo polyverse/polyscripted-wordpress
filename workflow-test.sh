@@ -6,13 +6,14 @@ git_root=`git rev-parse --show-toplevel`
 
 function fail {
   echo $1 >&2
+  docker stop mysql-host; docker stop /wordpress
   exit 1
 }
 
 
 function try_curl {
   local n=1
-  local max=4
+  local max=5
   local delay=15
   while true; do
     curl http://localhost:8000/ && break || {
@@ -53,4 +54,4 @@ try_curl
 docker exec -t wordpress /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) && ! $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 
-
+docker stop mysql-host; docker stop /wordpress
