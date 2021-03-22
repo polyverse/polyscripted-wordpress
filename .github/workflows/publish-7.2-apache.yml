@@ -3,6 +3,7 @@ on:
   push:
     paths: 
       - 'php7.2/apache/**'
+      - '.github/workflows/publish-7.2-apache.yml'
 jobs:
     build:
       runs-on: ubuntu-latest
