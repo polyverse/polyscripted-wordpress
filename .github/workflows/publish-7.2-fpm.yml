@@ -4,6 +4,8 @@ on:
     paths: 
       - 'php7.2/fpm-alpine/**'
       - '.github/workflows/publish-7.2-fpm.yml'
+  repository_dispatch:    
+   type: [build_7.2_fpm]
 jobs:
     build:
       runs-on: ubuntu-latest

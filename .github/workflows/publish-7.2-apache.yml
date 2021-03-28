@@ -4,6 +4,8 @@ on:
     paths: 
       - 'php7.2/apache/**'
       - '.github/workflows/publish-7.2-apache.yml'
+  repository_dispatch:    
+    type: [build_7.2_apache]    
 jobs:
     build:
       runs-on: ubuntu-latest
@@ -14,7 +16,7 @@ jobs:
         run: ./publish-image.sh
         working-directory: ./php7.2/apache/
       - name: Test 7.2 WordPress Image
-        run: ./workflow-test.sh --test
+        run: ./workflow-test.sh
         shell: bash
         working-directory: ./
       - uses: docker/login-action@v1
