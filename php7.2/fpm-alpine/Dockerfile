@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.2-alpine3.11-fpm:bba9927d5e4c7636b200c663070bacb6aecdc509
+FROM polyverse/ps-php7.2-alpine3.11-fpm:latest
 
 
 RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io; \

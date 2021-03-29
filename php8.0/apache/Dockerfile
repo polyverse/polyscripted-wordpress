@@ -1,4 +1,4 @@
-FROM polyverse/ps-php8.0-apache:2a205de035e60723d403d5bab3ca5974f1e9d6be
+FROM polyverse/ps-php8.0-buster-apache:latest
 
 # persistent dependencies
 RUN set -eux; \
