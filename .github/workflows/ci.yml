@@ -1,7 +1,0 @@
-name: Github CI Upstream Build Tools
-
-on:
-   schedule:
-     - cron: 0 5 * * *
-
-
