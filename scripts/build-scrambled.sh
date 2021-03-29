@@ -16,7 +16,7 @@ if [ ! -d "${POLYSCRIPT_PATH}/vanilla-save" ]; then
     cp -p $PHP_SRC_PATH/ext/phar/phar.php /usr/local/bin/polyscripting/vanilla-save/phar.php
 fi
 
-$POLYSCRIPT_PATH//php-scrambler 
+$POLYSCRIPT_PATH//php-scrambler
 
 cp -p $PHP_SRC_PATH/ext/phar/phar.php .
 
