@@ -1,9 +1,10 @@
 #!/bin/bash
-set -e
+set -ex
 
 image=`docker images | awk '{print $1}' | awk 'NR==2'`
-container="test-build-wordpress"
+container="wordpress"
 git_root=`git rev-parse --show-toplevel`
+compose=$1
 
 function fail {
   echo $1 >&2
@@ -41,8 +42,14 @@ function try_curl {
   }
 
 function start {
-        docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-	docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 $image 
+	if [[ -z $compose ]]; then
+		docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
+		docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 $image 
+	else
+		echo "alpine"
+		docker tag $image $image:alpine-7.2-test
+		MODE=$MODE headsha="test" docker-compose -f $compose up 
+	fi
 }
 
 echo "testing vanilla wordpress"
