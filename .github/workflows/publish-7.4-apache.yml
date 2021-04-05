@@ -5,7 +5,7 @@ on:
       - 'php7.4/apache/**'
       - '.github/workflows/publish-7.4-apache.yml'  
   repository_dispatch:          
-   type: [build_7.4_apache]
+   types: [build_7.4_apache]
 jobs:
     build:
       runs-on: ubuntu-latest
