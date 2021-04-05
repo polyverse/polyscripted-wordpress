@@ -4,7 +4,7 @@ on:
       - 'php8.0/apache/**'
       - '.github/workflows/publish-8.0-apache.yml'
   repository_dispatch:    
-   type: [build_8.0_apache]
+   types: [build_8.0_apache]
 jobs:
     build:
       runs-on: ubuntu-latest
