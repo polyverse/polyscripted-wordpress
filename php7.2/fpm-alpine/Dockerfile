@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.2-alpine3.11-fpm:latest
+FROM polyverse/ps-php7.2-alpine3.11-fpm:latest 
 
 
 RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io; \
@@ -8,9 +8,9 @@ RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@
 
 # docker-entrypoint.sh dependencies
 RUN apk add --no-cache \
-# in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
+		ghostscript \
+		imagemagick \
 		bash \
-# BusyBox sed is not sufficient for some of our sed expressions
 		sed
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
@@ -22,11 +22,11 @@ RUN set -ex; \
 		libjpeg-turbo-dev \
 		libpng-dev \
                 argon2-dev \
+                libsodium-dev \
                 coreutils \
                 curl-dev \
                 libedit-dev \
-                libsodium-dev \
-                libxml2-dev \
+ 		libxml2-dev \
                 openssl-dev \
                 sqlite-dev \
 	; \
@@ -37,7 +37,6 @@ RUN set -ex; \
 		exif \
 		gd \
 		mysqli \
-		opcache \
 		zip \
 	; \
 	pecl install imagick-3.4.4; \
@@ -53,7 +52,9 @@ RUN set -ex; \
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
-RUN { \
+RUN set -eux; \
+	docker-php-ext-enable opcache; \
+	{ \
 		echo 'opcache.memory_consumption=128'; \
 		echo 'opcache.interned_strings_buffer=8'; \
 		echo 'opcache.max_accelerated_files=4000'; \

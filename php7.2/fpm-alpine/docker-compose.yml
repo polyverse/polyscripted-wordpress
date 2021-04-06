@@ -23,6 +23,7 @@ services:
       - MODE=$MODE
   
   db:
+    container_name: mysql-host
     image: mysql:5.7
     networks: [wordpress]
     environment: [MYSQL_ROOT_PASSWORD=secret]
