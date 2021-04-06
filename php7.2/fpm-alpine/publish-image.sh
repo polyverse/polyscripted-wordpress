@@ -7,6 +7,7 @@ headsha=$(git rev-parse --verify HEAD)
 echo "Copying scripts into current directory for docker build context..."
 cp -Rp ../../scripts .
 
+echo "Building and Tagging"
 #Build and Tage
 docker build -t $image:alpine-7.2-$headsha .
 docker tag $image:alpine-7.2-$headsha $image:alpine-7.2
@@ -14,6 +15,7 @@ docker tag $image:alpine-7.2-$headsha $image:latest
 
 #Dockerhub Respository
 if [[ "$1" == "-p" ]]; then
+	echo "Pushing to Docker Hub"
 	docker push $image:alpine-7.2-$headsha
 	docker push $image:alpine-7.2-latest
 	docker push $image:latest
