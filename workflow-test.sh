@@ -46,7 +46,6 @@ function start {
 		docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
 		docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 $image 
 	else
-		echo "alpine"
 		docker tag $image $image:alpine-7.2-test
 		MODE=$MODE headsha="test" docker-compose -f $compose up 
 	fi
@@ -54,7 +53,7 @@ function start {
 
 echo "testing vanilla wordpress"
 start &
-sleep 20
+sleep 45
 if [ "$( docker container inspect -f '{{.State.Running}}' $container )" == "false" ]; then
         fail "Vanilla container failed to start -- check container errors."
 fi
