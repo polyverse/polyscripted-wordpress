@@ -12,7 +12,7 @@ echo "Building and Tagging"
 docker build -t $image:alpine-7.2-$headsha .
 docker tag $image:alpine-7.2-$headsha $image:alpine-7.2
 docker tag $image:alpine-7.2-$headsha $image:alpine-7.2-latest
-
+docker tag $image:alpine-7.2-$headsha $iamge:latest
 #Dockerhub Respository
 if [[ "$1" == "-p" ]]; then
 	echo "Pushing to Docker Hub"
