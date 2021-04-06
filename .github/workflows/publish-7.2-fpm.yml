@@ -18,6 +18,7 @@ jobs:
       - name: Test 7.2 WordPress Image
         run: ./workflow-test.sh ./php7.2/fpm-alpine/docker-compose.yml 
         shell: bash
+        working-directory: ./
       - uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
