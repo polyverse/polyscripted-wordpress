@@ -11,14 +11,13 @@ echo "Building and Tagging"
 #Build and Tage
 docker build -t $image:alpine-7.2-$headsha .
 docker tag $image:alpine-7.2-$headsha $image:alpine-7.2
-docker tag $image:alpine-7.2-$headsha $image:latest
+docker tag $image:alpine-7.2-$headsha $image:alpine-7.2-latest
 
 #Dockerhub Respository
 if [[ "$1" == "-p" ]]; then
 	echo "Pushing to Docker Hub"
 	docker push $image:alpine-7.2-$headsha
 	docker push $image:alpine-7.2-latest
-	docker push $image:latest
 fi
 #Github Container Repository
 if [[ "$1" == "-g" ]]; then
