@@ -125,6 +125,7 @@ RUN curl -L -o /usr/local/bin/tini https://github.com/krallin/tini/releases/late
 
 WORKDIR $POLYSCRIPT_PATH
 COPY scripts/* $POLYSCRIPT_PATH/
+RUN mv docker-entrypoint.sh /usr/local/bin
 
 # apache2-foreground comes from inherited container's CMD, which we chain
 ENTRYPOINT ["/usr/local/bin/tini", "-g", "--", "bash", "-c"]
