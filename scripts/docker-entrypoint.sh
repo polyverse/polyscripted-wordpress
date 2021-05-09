@@ -96,6 +96,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			chown "$user:$group" .htaccess
 		fi
 	fi
+	
+	if [ ! -e wp-content/plugins/polyscripting-plugin ]; then
+		#TODO: Pull release.
+		git clone https://github.com/polyverse/polyscripting-plugin wp-content/plugins/polyscripting-plugin
+	fi
 
 	# allow any of these "Authentication Unique Keys and Salts." to be specified via
 	# environment variables with a "WORDPRESS_" prefix (ie, "WORDPRESS_AUTH_KEY")

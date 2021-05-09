@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e 
 image="polyverse/polyscripted-wordpress"
 echo "$(date) Obtaining current git sha for tagging the docker image"
