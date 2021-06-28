@@ -1,15 +1,43 @@
 #!/bin/bash
 
-if [ "$(ls -A /var/www/html)" ]; then
-	echo "The directory /var/www/html is non-empty. This is unexpected and dangerous for this container."
-	echo "This container expects Wordpress (or the PHP app) at location '/wordpress' which will then be"
-	echo "properly provided at /var/www/html either directly or polyscripted."
-	echo ""
-	echo "To avoid destroying your code, aboring this container."
+### LOCK TO ENSURE MULTIPLE SCRAMBLES ARE NOT CALLED SIMULTANEOUSLY ###
+exec 100>/var/tmp/scramble.lock || exit 1
+flock -n 100 || exit 1
+trap 'rm -f /var/tmp/scramble.lock' EXIT
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###  ###
 
+
+for i in "$@"
+do
+case $i in
+    --overwrite|-o)
+    OW=1
+    shift # past argument with no value
+    ;;
+    *)
+    ;;
+esac
+done
+
+if [[ $(ls -A /var/www/html) && $OW -ne 1 ]]; then
+	echo "The directory /var/www/html is non-empty. This is unexpected and dangerous for this container."
+	echo "To run this script, pass arugment --overwrite to enable overwriting /var/www/html directory."
 	exit 1
-else
-	rm -rf /var/www/html
+fi
+
+if [ ! -v PHP_EXEC ]; then
+	PHP_EXEC=/usr/local/bin
+fi
+
+if [ ! -f "${PHP_EXEC}/s_php" ]; then
+    $POLYSCRIPT_PATH/reset.sh
+    cp -p $PHP_EXEC/php $POLYSCRIPT_PATH/s_php
+fi
+
+if [[ "$MODE" == "merge" ]]; then
+    echo "Merging files only."
+    export MODE=polyscripted
+    merge=true
 fi
 
 if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
@@ -24,10 +52,15 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 
 	echo "Starting polyscripted WordPress"
 	cd $POLYSCRIPT_PATH
-	sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
-    	 ./build-scrambled.sh
-	if [ -f scrambled.json ] && s_php tok-php-transformer.php -p /var/www/temp --replace; then
-		rm -rf /var/www/html
+	sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/temp/wp-config.php
+
+    if ! [[ "$merge" == 'true' && -f scrambled.json ]] ; then
+        echo "Build flag found."
+        ./build-scrambled.sh
+    fi
+
+	if [ -f scrambled.json ] && ./s_php tok-php-transformer.php -p /var/www/temp --replace; then
+        rm -rf /var/www/html
 		mv /var/www/temp /var/www/html
 		echo "Polyscripting enabled."
 		echo "done"
@@ -46,11 +79,8 @@ else
     echo "  1. Set the environment variable: MODE=polyscripted"
     echo "  2. OR create a file at path: /polyscripted"
 
-    if [ -d $POLYSCRIPT_PATH/vanilla-save ]; then
-	    $POLYSCRIPT_PATH/reset.sh
-    fi
-
     # Symlink the mount so it's editable
+    rm -rf /var/www/html
     ln -s /wordpress /var/www/html
 fi
 
@@ -77,3 +107,8 @@ else
 
 	fi
 fi
+
+if [ -f "${POLYSCRIPT_PATH}/s_php" ]; then
+    rm  $POLYSCRIPT_PATH/s_php
+fi
+

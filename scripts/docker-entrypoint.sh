@@ -98,8 +98,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	fi
 	
 	if [ ! -e wp-content/plugins/polyscripting-plugin ]; then
-		#TODO: Pull release.
-		git clone https://github.com/polyverse/polyscripting-plugin wp-content/plugins/polyscripting-plugin
+	 mkdir wp-content/plugins/polyscripting-plugin && curl -sL https://github.com/polyverse/polyscripting-plugin/archive/refs/tags/2.0.tar.gz | tar xvfz - -C wp-content/plugins/polyscripting-plugin --strip-components=1
 	fi
 
 	# allow any of these "Authentication Unique Keys and Salts." to be specified via
@@ -299,14 +298,26 @@ EOPHP
 		unset "$e"
 	done
 
-	if [ -e $POLYSCRIPT_PATH/scramble.sh ]; then
-		echo "Scrambler script found. Calling it..."
-		$POLYSCRIPT_PATH/scramble.sh
-	fi
-fi
 
-if [ -f "/usr/local/bin/s_php" ]; then
-    rm -rf /usr/local/bin/s_php
+	if [ "$(ls -A /var/www/html)" ]; then
+		echo "The directory /var/www/html is non-empty. This is unexpected and dangerous for this container."
+		echo "This container expects Wordpress (or the PHP app) at location '/wordpress' which will then be"
+		echo "properly provided at /var/www/html either directly or polyscripted."
+		echo ""
+		echo "To avoid destroying your code, aboring this container."
+		
+		exit 1
+	else
+		rm -rf /var/www/html
+	fi
+	echo root >> /etc/incron.allow
+	scramble.sh
+	if [ $? -eq 0 ]; then
+		echo "Scrambler script found & called."
+	else
+		echo "Scramble script not found. Failed" 
+		exit 0
+	fi
 fi
 
 # Get all child processes to send data to us such that we can

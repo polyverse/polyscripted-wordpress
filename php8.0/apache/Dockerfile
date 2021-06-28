@@ -1,4 +1,4 @@
-FROM polyverse/ps-php8.0-buster-apache:latest
+FROM polyverse/ps-php7.4-buster-apache  
 
 # persistent dependencies
 RUN set -eux; \
@@ -19,6 +19,8 @@ RUN set -ex; \
 		libfreetype6-dev \
 		libjpeg-dev \
 		ncat \
+		cron \
+		incron \
 		vim \
 		git \
 		libmagickwand-dev \
@@ -37,16 +39,7 @@ RUN set -ex; \
 		opcache \
 		zip \
 	; \
-	# Thanks to: https://github.com/Imagick/imagick/issues/331#issuecomment-743271207
-	# Enable the line below once it's on PECL
-	# pecl install imagick-3.4.4; \
-	# Until then, we're going to install from source!
-	cd /opt; \
-	git clone https://github.com/Imagick/imagick; \
-	cd imagick; \
-	phpize && ./configure; \
-	make; \
-	make install; \
+	pecl install imagick-3.4.4; \
 	docker-php-ext-enable imagick; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
@@ -125,7 +118,7 @@ RUN curl -L -o /usr/local/bin/tini https://github.com/krallin/tini/releases/late
 
 WORKDIR $POLYSCRIPT_PATH
 COPY scripts/* $POLYSCRIPT_PATH/
-RUN mv docker-entrypoint.sh /usr/local/bin
+RUN mv scramble.sh /usr/local/bin
 
 # apache2-foreground comes from inherited container's CMD, which we chain
 ENTRYPOINT ["/usr/local/bin/tini", "-g", "--", "bash", "-c"]

@@ -1,11 +1,25 @@
 #!/bin/bash
-
-
-
 # 80-character wide dashes for intermittent use
 # echo "--------------------------------------------------------------------------------"
 
-CONTAINER_NAME=wordpress
+php_version=apache-8.0
+
+if [[ "$CONTAINER_NAME" == "" ]]; then
+    echo "No container name env variable found, defaulting to wordpress."
+    CONTAINER_NAME=wordpress
+fi
+if [[ "$CONTAINER_PORT" == "" ]]; then
+	echo "No override container port found, using default exposed port 80."
+	CONTAINER_PORT=80
+fi
+if [[ "$HOST_PORT" == "" ]]; then
+    echo "No host port env variable found, defaulting to port 8000."
+    HOST_PORT=8000
+fi
+if [[ "$CONTAINER_ADDRESS" == "" ]]; then
+    echo "Defaulting to localhost for cron."
+    CONTAINER_ADDRESS="http://localhost:$CONTAINER_PORT"
+fi
 
 function getContainerHealth {
   docker inspect --format "{{.State.Health.Status}}" $1
@@ -81,7 +95,7 @@ fi
 
 
 echo "---------------------------WORDPRESS DIRECTORY---------------------------------"
-if [[ "$WORDPRESSDIR" == "" ]]; then
+if [[ "$WORDPRESS_DIR" == "" ]]; then
 	echo "    A Wordpress directory was not specified. Using a default directory"
 	echo "    under the current path: $PWD/wordpress."
 	echo ""
@@ -91,13 +105,13 @@ if [[ "$WORDPRESSDIR" == "" ]]; then
 	while true; do
 	    read -p "Do you wish to use this wordpress directory?" yn
 	    case $yn in
-		[Yy]* ) export WORDPRESSDIR=$PWD/wordpress; break;;
+		[Yy]* ) export WORDPRESS_DIR=$PWD/wordpress; break;;
 		[Nn]* ) exit;;
 		* ) echo "Please answer yes or no.";;
 	    esac
 	done
 else
-	echo "Using wordpress installation from directory: $WORDPRESSDIR"
+	echo "Using wordpress installation from directory: $WORDPRESS_DIR"
 fi
 
 echo "-------------------------WORDPRESS CONFIGURATION--------------------------------"
@@ -143,54 +157,26 @@ else
     echo "Found existing database configuration."
 fi
 
+echo "-------------------------SYSTEM CRON ----------------------------------------"
+echo "For optimization a system cron is utilized for the plugin."
+echo "Set CONTAINER_ADDRESS to configure this cron."
+echo "To disable cron jobs set WP_DISABLE_CRON and WP_DISABLE_INCRON to true."
+echo ""
+
 echo "-------------------------WORDPRESS STARTUP--------------------------------------"
 echo "$(date) Obtaining current git sha for tagging the docker image"
 headsha=$(git rev-parse --verify HEAD)
-if [[ "$CONTAINERPORT" == "" ]]; then
-	echo "No override container port found, using default exposed port 80."
-	CONTAINERPORT=80
-fi
-if [[ "$HOSTPORT" == "" ]]; then
-        echo "No host port env variable found, defaulting to port 8000."
-        HOSTPORT=8000
-fi
-wpcmd="docker run -t -d -e MODE=$MODE --name $CONTAINER_NAME -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-8.0-$headsha bash"
-if [[ "$*" == "-f" ]]
-then
-    echo "YES"
-else
-    echo "NO"
-fi
 
-function startBackgroundTasks() {
-if [[ $PLUGIN != "true" ]]; then 
-	while true; do
-		read -p "Do you want to start dispatcher for the polyscripting plugin to allow scrambling from the wordpress plugin?"
-		case $yn in
-			[Yy]* ) docker exec -d $CONTAINER_NAME ./dispatch.sh 2323; echo "Set PLUGIN to true to skip this prompt."; break;;
-			[Nn]* ) echo "To enable dispatcher in the future run: docker exec -d $CONTAINER_NAME ./dispatch.sh 2323; break;;"; break;;
-			* ) echo "Please answer yes or no.";;
-		esac
-	done
-else
-	docker exec -d $CONTAINER_NAME ./dispatch.sh 2323;
-fi
-	echo "Starting apache server inside $CONTAINER_NAME"
-        docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;
-}
+wpcmd="docker run -t -e MODE=$MODE -e CONTAINER_ADDRESS=$CONTAINER_ADDRESS --name $CONTAINER_NAME -v $WORDPRESS_DIR:/wordpress -p $HOST_PORT:$CONTAINER_PORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:$php_version-$headsha"
 
 function startContainer() {
     if [[ $(docker ps -aq -f status=exited -f name=$CONTAINER_NAME) ]]; then
-        echo "Existing container found, but it is stopped. Starting now."
-        docker start $CONTAINER_NAME
-        startBackgroundTasks
+        echo "Existing container found, but it is stopped."
+        echo "Restart, rename, or delete existing container."
     elif [[ $(docker ps -q -f status=running -f name=$CONTAINER_NAME) ]]; then
         echo "Container already running."
-        echo "To start dispatcher run: 'docker exec -d $CONTAINER_NAME ./dispatch.sh 2323'"
-        echo "To start apache run: 'docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;'"
     else
             eval $wpcmd;
-	    startBackgroundTasks 
     fi
 }
 

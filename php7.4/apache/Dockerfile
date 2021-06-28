@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.4-apache:latest
+FROM polyverse/ps-php7.4-buster-apache:latest
 
 # persistent dependencies
 RUN set -eux; \
@@ -19,7 +19,10 @@ RUN set -ex; \
 		libfreetype6-dev \
 		libjpeg-dev \
 		ncat \
+		cron \
+		incron \
 		vim \
+		git \
 		libmagickwand-dev \
 		libpng-dev \
 		libzip-dev \
@@ -115,6 +118,7 @@ RUN curl -L -o /usr/local/bin/tini https://github.com/krallin/tini/releases/late
 
 WORKDIR $POLYSCRIPT_PATH
 COPY scripts/* $POLYSCRIPT_PATH/
+RUN mv scramble.sh /usr/local/bin
 
 # apache2-foreground comes from inherited container's CMD, which we chain
 ENTRYPOINT ["/usr/local/bin/tini", "-g", "--", "bash", "-c"]
