@@ -1,9 +1,8 @@
 name: Publish 7.2 Apache Image 
 on: 
   push:
-    paths: 
-      - 'php7.2/apache/**'
-      - '.github/workflows/publish-7.2-apache.yml'
+    branches:
+     - main
   repository_dispatch:    
     types: [build_7.2_apache]    
 jobs:
