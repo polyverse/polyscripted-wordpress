@@ -1,9 +1,8 @@
 name: Publish 7.4 Apache Image
 on: 
   push:
-    paths: 
-      - 'php7.4/apache/**'
-      - '.github/workflows/publish-7.4-apache.yml'  
+    branches:
+     - main
   repository_dispatch:          
    types: [build_7.4_apache]
 jobs:
