@@ -1,8 +1,7 @@
 on: 
   push:
-    paths: 
-      - 'php8.0/apache/**'
-      - '.github/workflows/publish-8.0-apache.yml'
+    branches:
+     - main
   repository_dispatch:    
    types: [build_8.0_apache]
 jobs:
