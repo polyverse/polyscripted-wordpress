@@ -21,8 +21,14 @@ fi
 #Github Container Repository
 if [[ "$1" == "-g" ]]; then
         echo "Pushing to Github Container Repository"
+
+	# Push specific sha
         docker tag $image:apache-7.4-$headsha ghcr.io/$image:apache-7.4-$headsha
         docker push ghcr.io/$image:apache-7.4-$headsha
+
+	# Push latest
+        docker tag $image:apache-7.4-$headsha ghcr.io/$image:apache-7.4
+        docker push ghcr.io/$image:apache-7.4
 fi
 
 echo "Removing temporary scripts"
