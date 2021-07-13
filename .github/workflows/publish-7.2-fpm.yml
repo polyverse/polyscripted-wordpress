@@ -1,9 +1,8 @@
 name: Publish 7.2 FPM-Alpine Image
 on: 
   push:
-    paths: 
-      - 'php7.2/fpm-alpine/**'
-      - '.github/workflows/publish-7.2-fpm.yml'
+    branches:
+     - main
   repository_dispatch:    
    types: [build_7.2_fpm]
 jobs:
