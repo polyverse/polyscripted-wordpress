@@ -8,9 +8,11 @@ if [ "$1" == "FIRST_CALL" ] && [ "$(ls -A /var/www/html)" ]; then
 	echo "To avoid destroying your code, aboring this container."
 
 	exit 1
-else if [ "$(ls -A /var/www/html)" ]; then
+elif [ "$(ls -A /var/www/html)" ]; then
 	echo "The directory /var/www/html is non-empty, but this isn't the first call to scramble, therefore"
 	echo "a previous invocation of scramble has set this up. Deleting the directory brutally."
+	rm -rf /var/www/html
+else
 	rm -rf /var/www/html
 fi
 
@@ -74,6 +76,7 @@ else
 		if [ ! -d /wordpress/wp-content/uploads ]; then
 			echo "Creating a directory for uploads at: /wordpress/wp-content/uploads"
 			mkdir /wordpress/wp-content/uploads
+			chown www-data:www-data /wordpress/wp-content/uploads
 		fi
 
 		if [ -d /var/www/html/wp-content/uploads ]; then
