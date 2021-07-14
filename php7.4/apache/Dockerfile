@@ -1,5 +1,7 @@
 FROM ghcr.io/polyverse/ps-php7.4-buster-apache:latest
 
+ENV PHP_EXEC=/usr/local/bin
+
 # persistent dependencies
 RUN set -eux; \
 	apt-get update; \

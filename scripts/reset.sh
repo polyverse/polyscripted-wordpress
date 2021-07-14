@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2020 Polyverse Corporation
+set -ex
 
 echo "RESETTING back to Vanilla PHP"
 
