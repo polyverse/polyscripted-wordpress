@@ -97,7 +97,7 @@ fi
 
 # Ensure works
 try_curl
-docker exec -t $container /bin/bash -c 'if [[ ! $(diff /wordpress/index.php /var/www/html/index.php) && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) == "" && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 # Live-scramble through dispatcher multiple times and ensure works and is polyscripted
 repeated_scramble
