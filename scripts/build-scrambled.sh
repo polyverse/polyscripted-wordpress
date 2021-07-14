@@ -27,8 +27,3 @@ $PHP_EXEC/s_php tok-php-transformer.php -p $POLYSCRIPT_PATH//phar.php --replace
 mv $POLYSCRIPT_PATH//phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
 cd $PHP_SRC_PATH; make -o ext/phar/phar.php install -k; cd $POLYSCRIPT_PATH;
-
-echo "Restoring Vanilla Save for next invocation..."
-cp -p $POLYSCRIPT_PATH/vanilla-save/zend_language_scanner.l $PHP_SRC_PATH/Zend/zend_language_scanner.l
-cp -p $POLYSCRIPT_PATH/vanilla-save/zend_language_parser.y $PHP_SRC_PATH/Zend/zend_language_parser.y
-cp -p $POLYSCRIPT_PATH/vanilla-save/phar.php $PHP_SRC_PATH/ext/phar/phar.php
