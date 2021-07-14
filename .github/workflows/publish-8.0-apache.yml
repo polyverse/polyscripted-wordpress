@@ -1,3 +1,4 @@
+name: Publish 8.0 Apache Image
 on: 
   push:
     branches:
