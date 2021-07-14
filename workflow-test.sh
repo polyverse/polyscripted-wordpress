@@ -106,7 +106,7 @@ repeated_scramble
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
 await_scramble_finish
 try_curl
-docker exec -t $container /bin/bash -c 'if [[ ! $(diff /wordpress/index.php /var/www/html/index.php) && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) == "" && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 
 docker stop mysql-host; docker stop $container
@@ -131,7 +131,7 @@ repeated_scramble
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
 await_scramble_finish
 try_curl
-docker exec -t $container /bin/bash -c 'if [[ ! $(diff /wordpress/index.php /var/www/html/index.php) && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) == "" && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
         fail "WordPess container failed -- check polyscripting errors."
