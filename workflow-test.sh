@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex
 
-image=`docker images | awk '{print $1}' | awk 'NR==2'`
+image=`docker images | awk '{print $1}' |grep polyscripted-wordpress | awk 'NR==1'`
 container="wordpress"
 git_root=`git rev-parse --show-toplevel`
 compose=$1
@@ -25,8 +25,8 @@ function try_curl {
         sleep $delay;
       else
         fail "Unable to connect to WordPress after $n attempts."
-      fi  
-    }   
+      fi
+    }
   echo "Curled success. Checking Syntax."
   done
   if curl -f  http://localhost:8000/; then
@@ -36,7 +36,7 @@ function try_curl {
   		echo "Site ran successfully."
   	fi
    else
-	  fail "Site could not be reached" 
+	  fail "Site could not be reached"
   fi
 
   }
@@ -44,11 +44,11 @@ function try_curl {
 function start {
 	if [[ -z $compose ]]; then
 		docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-		docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 $image 
+		docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 $image
 	else
 		echo "alpine"
 		docker tag $image $image:alpine-7.2-test
-		MODE=$MODE headsha="test" docker-compose -f $compose up 
+		MODE=$MODE headsha="test" docker-compose -f $compose up
 	fi
 }
 
@@ -67,13 +67,13 @@ start &
 sleep 55
 echo "Testing container started"
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
-	fail "WordPess container failed to start -- check polyscripting errors."	
+	fail "WordPess container failed to start -- check polyscripting errors."
 fi
 try_curl
 docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) && ! $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
-        fail "WordPess container failed -- check polyscripting errors."    
+        fail "WordPess container failed -- check polyscripting errors."
 fi
 
 docker stop mysql-host; docker stop $container
