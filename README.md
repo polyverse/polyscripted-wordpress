@@ -2,10 +2,6 @@
 
 [![Publish 7.4 Apache Image](https://github.com/polyverse/polyscripted-wordpress/actions/workflows/publish-7.4-apache.yml/badge.svg)](https://github.com/polyverse/polyscripted-wordpress/actions/workflows/publish-7.4-apache.yml)
 
-[![Publish 7.2 FPM-Alpine Image](https://github.com/polyverse/polyscripted-wordpress/actions/workflows/publish-7.2-fpm.yml/badge.svg)](https://github.com/polyverse/polyscripted-wordpress/actions/workflows/publish-7.2-fpm.yml)
-
-[![Publish 7.2 Apache Image](https://github.com/polyverse/polyscripted-wordpress/actions/workflows/publish-7.2-apache.yml/badge.svg)](https://github.com/polyverse/polyscripted-wordpress/actions/workflows/publish-7.2-apache.yml)
-
 ## Polyscripted Wordpress
 
 This is the root project for Polyscripted WordPress.
