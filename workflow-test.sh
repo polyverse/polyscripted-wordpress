@@ -61,6 +61,14 @@ function repeated_scramble {
   done
 }
 
+function await_scramble_finish {
+   while $(( `ps aux |grep scramble.sh |wc -l` -gt 1 )); do
+    echo "Waiting for scrambling to finish"
+   done
+   echo "Scrambling finished. Waiting 1 second more to let webserver start back up..."
+   sleep 1
+}
+
 function scramble {
   # Scramble/rescramble using either 1 or 2 as parameters to dispatcher
   scramble_dispatcher_command=$((1 + $RANDOM % 2))
@@ -71,6 +79,8 @@ function scramble {
   elif [ "$scramble_dispatcher_command" == "2" ]; then
     docker exec -t $container /bin/bash -c 'echo "2 " | nc localhost 2323'
   fi
+
+  await_scramble_finish
 
   # Ensure works and is Polyscrpted
   try_curl
@@ -87,20 +97,24 @@ fi
 
 # Ensure works
 try_curl
+docker exec -t $container /bin/bash -c 'if [[ ! $(diff /wordpress/index.php /var/www/html/index.php) && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 # Live-scramble through dispatcher multiple times and ensure works and is polyscripted
 repeated_scramble
 
 # Unscramble through dispatcher and ensure works
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
+await_scramble_finish
 try_curl
+docker exec -t $container /bin/bash -c 'if [[ ! $(diff /wordpress/index.php /var/www/html/index.php) && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 
 docker stop mysql-host; docker stop $container
 echo "testing Polyscripted wordpress"
 MODE=polyscripted
 start &
-sleep 55
+sleep 1
+await_scramble_finish
 echo "Testing container started"
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
 	fail "WordPess container failed to start -- check polyscripting errors."
@@ -115,7 +129,9 @@ repeated_scramble
 
 # Unscramble through dispatcher and ensure works
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
+await_scramble_finish
 try_curl
+docker exec -t $container /bin/bash -c 'if [[ ! $(diff /wordpress/index.php /var/www/html/index.php) && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
 
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
         fail "WordPess container failed -- check polyscripting errors."
