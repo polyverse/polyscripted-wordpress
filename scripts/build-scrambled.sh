@@ -1,12 +1,9 @@
 #!/bin/bash
 # Copyright (c) 2020 Polyverse Corporation
-
-if [ ! -v PHP_EXEC ]; then
-	PHP_EXEC=/usr/local/bin
-fi
+set -e
 
 if [ ! -f "${PHP_EXEC}/s_php" ]; then
-    echo "Backing up original php to s_php..."
+    echo "Backing up original php executable to s_php..."
     cp -p $PHP_EXEC/php $PHP_EXEC/s_php
 fi
 
@@ -19,11 +16,11 @@ if [ ! -d "${POLYSCRIPT_PATH}/vanilla-save" ]; then
 fi
 
 echo "Creating a new PHP scramble..."
-$POLYSCRIPT_PATH//php-scrambler
+$POLYSCRIPT_PATH/php-scrambler
 
 cp -p $PHP_SRC_PATH/ext/phar/phar.php .
 
-$PHP_EXEC/s_php tok-php-transformer.php -p $POLYSCRIPT_PATH//phar.php --replace
-mv $POLYSCRIPT_PATH//phar.php $PHP_SRC_PATH/ext/phar/phar.php
+$PHP_EXEC/s_php tok-php-transformer.php -p $POLYSCRIPT_PATH/phar.php --replace
+mv $POLYSCRIPT_PATH/phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
 cd $PHP_SRC_PATH; make -o ext/phar/phar.php install -k; cd $POLYSCRIPT_PATH;

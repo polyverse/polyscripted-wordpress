@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ "$1" == "FIRST_CALL" ] && [ "$(ls -A /var/www/html)" ]; then
 	echo "The directory /var/www/html is non-empty. This is unexpected and dangerous for this container."
 	echo "This container expects Wordpress (or the PHP app) at location '/wordpress' which will then be"
@@ -57,9 +59,7 @@ else
     echo "  1. Set the environment variable: MODE=polyscripted"
     echo "  2. OR create a file at path: /polyscripted"
 
-    if [ -d $POLYSCRIPT_PATH/vanilla-save ]; then
-	    $POLYSCRIPT_PATH/reset.sh
-    fi
+	$POLYSCRIPT_PATH/reset.sh
 
     # Symlink the mount so it's editable
     ln -s /wordpress /var/www/html
