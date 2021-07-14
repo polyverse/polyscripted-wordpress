@@ -17,6 +17,7 @@ function try_curl {
   local n=1
   local max=5
   local delay=15
+
   while true; do
     curl http://localhost:8000/ && break || {
       if [[ $n -lt $max ]]; then
@@ -27,11 +28,12 @@ function try_curl {
         fail "Unable to connect to WordPress after $n attempts."
       fi
     }
-  echo "Curled success. Checking Syntax."
   done
+  echo "Curled success. Checking Syntax."
+
   if curl -f  http://localhost:8000/; then
   	if curl -f http://localhost:8000/ | grep -q "error" ; then
-		fail "Site ran with errors."
+		  fail "Site ran with errors."
   	else
   		echo "Site ran successfully."
   	fi
@@ -61,12 +63,32 @@ function repeated_scramble {
   done
 }
 
+function ensure_scrambled {
+    echo "Ensuring Wordpress is Scrambled"
+    docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) != "" ]]'
+    docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php; [ $? -ne 0 ]'
+    docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php'
+}
+
+function ensure_vanilla {
+  echo "Ensuring Wordpress is Vanilla"
+  docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) == "" ]]'
+  docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php'
+  docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php'
+}
+
 function await_scramble_finish {
-   while $(( `ps aux |grep scramble.sh |wc -l` -gt 1 )); do
-    echo "Waiting for scrambling to finish"
-   done
-   echo "Scrambling finished. Waiting 1 second more to let webserver start back up..."
-   sleep 1
+  echo "Waiting for scrambling to finish"
+  {
+    while [[ "$(docker exec $container /bin/bash -c 'ps aux |grep scramble.sh | grep -v grep |wc -l')" != "0" ]]; do
+      #echo "Waiting for scrambling to finish... $(docker exec $container /bin/bash -c 'ps aux |grep scramble.sh | grep -v grep |wc -l')"
+      sleep 1
+    done
+
+    sleep 1
+  } 2> /dev/null
+
+  echo "Scrambling finished."
 }
 
 function scramble {
@@ -84,7 +106,7 @@ function scramble {
 
   # Ensure works and is Polyscrpted
   try_curl
-  docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) && ! $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+  ensure_scrambled
 }
 
 echo "testing vanilla wordpress"
@@ -97,7 +119,7 @@ fi
 
 # Ensure works
 try_curl
-docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) == "" && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+ensure_vanilla
 
 # Live-scramble through dispatcher multiple times and ensure works and is polyscripted
 repeated_scramble
@@ -106,7 +128,7 @@ repeated_scramble
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
 await_scramble_finish
 try_curl
-docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) == "" && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+ensure_vanilla
 
 
 docker stop mysql-host; docker stop $container
@@ -122,7 +144,7 @@ fi
 
 # Ensure works and is Polyscrpted
 try_curl
-docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) && ! $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+ensure_scrambled
 
 # Live-scramble through dispatcher multiple times and ensure works and is polyscripted
 repeated_scramble
@@ -131,7 +153,7 @@ repeated_scramble
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
 await_scramble_finish
 try_curl
-docker exec -t $container /bin/bash -c 'if [[ $(diff /wordpress/index.php /var/www/html/index.php) == "" && $(php -l /wordpress/index.php) && $(php -l /var/www/html/index.php) ]]; then exit 0 else exit 1; fi'
+ensure_vanilla
 
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
         fail "WordPess container failed -- check polyscripting errors."

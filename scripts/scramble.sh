@@ -33,7 +33,7 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 	./build-scrambled.sh
 
 	# Set transformer memory limit
-	if [ $TRANSFORMER_MEMORY_LIMIT != "" ]; then
+	if [[ $TRANSFORMER_MEMORY_LIMIT != "" ]]; then
 		memory_limit_params="--memory_limit=$TRANSFORMER_MEMORY_LIMIT"
 	fi
 
