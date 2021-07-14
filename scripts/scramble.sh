@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$(ls -A /var/www/html)" ]; then
+if [ "$1" == "FIRST_CALL" ] && [ "$(ls -A /var/www/html)" ]; then
 	echo "The directory /var/www/html is non-empty. This is unexpected and dangerous for this container."
 	echo "This container expects Wordpress (or the PHP app) at location '/wordpress' which will then be"
 	echo "properly provided at /var/www/html either directly or polyscripted."
@@ -8,7 +8,9 @@ if [ "$(ls -A /var/www/html)" ]; then
 	echo "To avoid destroying your code, aboring this container."
 
 	exit 1
-else
+else if [ "$(ls -A /var/www/html)" ]; then
+	echo "The directory /var/www/html is non-empty, but this isn't the first call to scramble, therefore"
+	echo "a previous invocation of scramble has set this up. Deleting the directory brutally."
 	rm -rf /var/www/html
 fi
 

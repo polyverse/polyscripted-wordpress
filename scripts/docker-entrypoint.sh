@@ -296,7 +296,7 @@ EOPHP
 
 	if [ -e $POLYSCRIPT_PATH/scramble.sh ]; then
 		echo "Scrambler script found. Calling it..."
-		$POLYSCRIPT_PATH/scramble.sh
+		$POLYSCRIPT_PATH/scramble.sh "FIRST_CALL"
 	fi
 fi
 

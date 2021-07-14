@@ -24,7 +24,7 @@ function poly-dispatcher () {
                 echo "    ctrl-c to exit"
         esac
 	if ! [[ $err = 'true'  ]]; then
-		scramble.sh >& /usr/local/bin/polyscripting/to_main_process
+		/usr/local/bin/polyscripting/scramble.sh >& /usr/local/bin/polyscripting/to_main_process
 		service apache2 stop >& /usr/local/bin/polyscripting/to_main_process
 		/usr/local/bin/tini -s -- "apache2-foreground" >& /usr/local/bin/polyscripting/to_main_process &
 		err='false'
