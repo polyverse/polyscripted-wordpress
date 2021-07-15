@@ -111,7 +111,7 @@ for wpvar in $wpvars; do
 	wpvarparams="$wpvarparams -e $wpvar=\"${!wpvar}\""
 
 	if [[ "$WORDPRESS_DB_HOST" != "" ]]; then
-		
+
 		dbfound=true
 	fi
 done
@@ -154,7 +154,7 @@ if [[ "$HOSTPORT" == "" ]]; then
         echo "No host port env variable found, defaulting to port 8000."
         HOSTPORT=8000
 fi
-wpcmd="docker run -t -d -e MODE=$MODE --name $CONTAINER_NAME -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-$headsha bash"
+wpcmd="docker run -t -d -e MODE=$MODE --name $CONTAINER_NAME -v $WORDPRESSDIR:/wordpress -p $HOSTPORT:$CONTAINERPORT  $wpvarparams $dblink polyverse/polyscripted-wordpress:apache-7.4-${headsha} bash"
 if [[ "$*" == "-f" ]]
 then
     echo "YES"
@@ -163,7 +163,7 @@ else
 fi
 
 function startBackgroundTasks() {
-if [[ $PLUGIN != "true" ]]; then 
+if [[ $PLUGIN != "true" ]]; then
 	while true; do
 		read -p "Do you want to start dispatcher for the polyscripting plugin to allow scrambling from the wordpress plugin?"
 		case $yn in
@@ -190,7 +190,7 @@ function startContainer() {
         echo "To start apache run: 'docker exec -e MODE=$MODE  --workdir /usr/local/bin $CONTAINER_NAME ./docker-entrypoint.sh apache2-foreground;'"
     else
             eval $wpcmd;
-	    startBackgroundTasks 
+	    startBackgroundTasks
     fi
 }
 

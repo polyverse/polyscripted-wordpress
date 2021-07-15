@@ -47,10 +47,10 @@ function try_curl {
 function start {
 	if [[ -z $compose ]]; then
 		docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-		docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 $image
+		docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 ${image}
 	else
 		echo "alpine"
-		docker tag $image $image:alpine-7.2-test
+		docker tag ${image} ${image}:alpine-7.2-test
 		MODE=$MODE headsha="test" docker-compose -f $compose up
 	fi
 }
