@@ -19,10 +19,10 @@ echo "Creating a new PHP scramble..."
 $POLYSCRIPT_PATH/php-scrambler
 
 cp -p $PHP_SRC_PATH/ext/phar/phar.php .
-
 $PHP_EXEC/s_php tok-php-transformer.php  -d scrambled.json -p $POLYSCRIPT_PATH/phar.php --replace
 mv $POLYSCRIPT_PATH/phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
+echo "Compiling and installing new scramble..."
 cd $PHP_SRC_PATH
 # Ingore errors in building PHP
 make -o ext/phar/phar.php install -k || true
