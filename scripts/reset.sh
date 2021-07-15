@@ -11,4 +11,7 @@ if [ -d "${POLYSCRIPT_PATH}/vanilla-php" ]; then
 fi
 
 echo "Installing restored Vanilla PHP..."
-cd $PHP_SRC_PATH; make -o ext/phar/phar.php install -k; cd $POLYSCRIPT_PATH;
+cd $PHP_SRC_PATH
+# Ingore errors in building PHP
+make -o ext/phar/phar.php install -k || true
+cd $POLYSCRIPT_PATH;
