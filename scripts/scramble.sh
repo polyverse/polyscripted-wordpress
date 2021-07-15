@@ -25,7 +25,7 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 	    echo "Copying /wordpress to /var/www/temp to be polyscripted in place..."
 	    echo "This will prevent changes from being saved back to /wordpress, but will protect"
 	    echo "against code injection attacks..."
-		cp -Rp /wordpress /var/www/temp
+		cp -nRp /wordpress /var/www/temp
 	fi
 
 	echo "Starting polyscripted WordPress"
@@ -52,7 +52,7 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 		echo "done"
 	else
 		echo "Polyscripting failed."
-		cp -p /usr/local/bin/s_php /usr/local/bin/php
+		cp -np /usr/local/bin/s_php /usr/local/bin/php
 		exit 1
 	fi
 

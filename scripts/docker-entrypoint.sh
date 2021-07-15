@@ -300,10 +300,6 @@ EOPHP
 	fi
 fi
 
-if [ -f "/usr/local/bin/s_php" ]; then
-    rm -rf /usr/local/bin/s_php
-fi
-
 # Get all child processes to send data to us such that we can
 # print restarted apache output to stdout
 

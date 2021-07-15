@@ -6,7 +6,7 @@ echo "$(date) Obtaining current git sha for tagging the docker image"
 headsha=$(git rev-parse --verify HEAD)
 
 echo "Copying scripts into current directory for docker build context..."
-cp -Rp ../../scripts .
+cp -nRp ../../scripts .
 
 docker build -t $image:apache-8.0-$headsha .
 docker tag $image:apache-8.0-$headsha $image:apache-8.0
@@ -19,7 +19,7 @@ if [[ "$1" == "-p" ]]; then
 fi
 if [[ "$1" == "-g" ]]; then
         echo "Pushing to Github Container Repository"
-	
+
 	# Push specific sha
         docker tag $image:apache-8.0-$headsha ghcr.io/$image:apache-8.0-$headsha
         docker push ghcr.io/$image:apache-8.0-$headsha

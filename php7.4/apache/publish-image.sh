@@ -5,10 +5,10 @@ echo "$(date) Obtaining current git sha for tagging the docker image"
 headsha=$(git rev-parse --verify HEAD)
 
 echo "Copying scripts into current directory for docker build context..."
-cp -Rp ../../scripts .
+cp -nRp ../../scripts .
 
 #Build and Tag
-docker build -t $image:apache-7.4-$headsha .
+docker build --no-cache -t $image:apache-7.4-$headsha .
 docker tag $image:apache-7.4-$headsha $image:apache-7.4
 docker tag $image:apache-7.4-$headsha $image:latest
 
