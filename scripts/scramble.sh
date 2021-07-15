@@ -43,7 +43,7 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 	fi
 
 	echo "About to scramble files in /var/www/temp..."
-	if [ -f scrambled.json ] && s_php tok-php-transformer.php $memory_limit_params -p /var/www/temp --replace; then
+	if [ -f scrambled.json ] && s_php tok-php-transformer.php $memory_limit_params -d scrambled.json -p /var/www/temp --replace; then
 		echo "Removing existing /var/www/html"
 		rm -rf /var/www/html
 		echo "Moving /var/www/temp->/var/www/html"

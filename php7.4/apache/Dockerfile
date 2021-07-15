@@ -101,8 +101,8 @@ RUN set -eux; \
 WORKDIR $PHP_SRC_PATH
 RUN make install
 
-ENV WORDPRESS_VERSION 5.6
-ENV WORDPRESS_SHA1 db8b75bfc9de27490434b365c12fd805ca6784ce
+ENV WORDPRESS_VERSION 5.7.2
+ENV WORDPRESS_SHA1 c97c037d942e974eb8524213a505268033aff6c8
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \

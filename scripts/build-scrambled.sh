@@ -20,7 +20,7 @@ $POLYSCRIPT_PATH/php-scrambler
 
 cp -p $PHP_SRC_PATH/ext/phar/phar.php .
 
-$PHP_EXEC/s_php tok-php-transformer.php -p $POLYSCRIPT_PATH/phar.php --replace
+$PHP_EXEC/s_php tok-php-transformer.php  -d scrambled.json -p $POLYSCRIPT_PATH/phar.php --replace
 mv $POLYSCRIPT_PATH/phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
 cd $PHP_SRC_PATH
