@@ -7,7 +7,7 @@ git_root=`git rev-parse --show-toplevel`
 compose=$1
 
 function fail {
-  echo $1 >&2
+  echo "FATAL ERROR: $1" >&2
   docker stop mysql-host; docker stop $container
   exit 1
 }
@@ -67,22 +67,26 @@ function repeated_scramble {
 
 function ensure_scrambled {
     echo "Ensuring Wordpress is Scrambled"
-    docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) != "" ]]'
-    docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php; [ $? -ne 0 ]'
-    docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php'
+    docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) != "" ]] || { echo "Wordpress is not scrambled when expected. Empty diff between /wordpress/index.php and /var/www/html/index.php."; diff /wordpress/index.php /var/www/html/index.php; exit 1; }'
+    docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php; retcode=$?; if [[ $retcode -eq 0 ]]; then echo "Wordpress is not scrambled when expected. Polyscripted PHP was able to successfully parse Vanilla /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
+    docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "Wordpress transformation has probably failed. Polyscripted PHP was not able to successfully parse Polyscripted /var/www/html/index.php and exited with code $retcode"; exit 1; fi;'
 }
 
 function ensure_vanilla {
   echo "Ensuring Wordpress is Vanilla"
-  docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) == "" ]]'
-  docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php'
-  docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php'
+  docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) == "" ]] || { echo "Wordpress is scrambled when not expected. Printing diff between /wordpress/index.php and /var/www/html/index.php."; diff /wordpress/index.php /var/www/html/index.php; exit 1; }'
+  docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "Either one of PHP or Wordpress is scrambled when not expected. Expected Vanilla PHP was not able to successfully parse Vanilla /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
+  docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "Either one of PHP or Wordpress is scrambled when not expected. Expected Vanilla PHP was not able to successfully parse Expected Vanilla /var/www/html/index.php and exited with code $retcode"; exit 1; fi;'
 }
 
 function await_transform_finish {
+  # Wait 1 second for command to start...
+  sleep 1
+
   echo "Waiting for $1 to finish"
   {
-    while [[ "$(docker exec $container /bin/bash -c 'ps aux |grep scramble.sh | grep -v grep |wc -l')" != "0" ]]; do
+    is_running_command="ps aux |grep $1 | grep -v grep |wc -l"
+    while [[ "$(docker exec $container /bin/bash -c $is_running_command)" != "0" ]]; do
       #echo "Waiting for scrambling to finish... $(docker exec $container /bin/bash -c 'ps aux |grep scramble.sh | grep -v grep |wc -l')"
       sleep 1
     done
@@ -96,15 +100,10 @@ function await_transform_finish {
 function scramble {
   # Scramble/rescramble using either 1 or 2 as parameters to dispatcher
   scramble_dispatcher_command=$((1 + $RANDOM % 2))
+  scramble_bash_command="echo \"$scramble_dispatcher_command \" | nc localhost 2323"
+  docker exec -t $container /bin/bash -c $scramble_bash_command
 
-  # Using a dumb if-cascade because I don't know how to expand variables to bash -c
-  if [ "$scramble_dispatcher_command" == "1" ]; then
-    docker exec -t $container /bin/bash -c 'echo "1 " | nc localhost 2323'
-  elif [ "$scramble_dispatcher_command" == "2" ]; then
-    docker exec -t $container /bin/bash -c 'echo "2 " | nc localhost 2323'
-  fi
-
-  await_scramble_finish "Scrambling"
+  await_transform_finish "scramble.sh"
 
   # Ensure works and is Polyscrpted
   try_curl
@@ -116,7 +115,7 @@ echo "--------------------------------------------------------------------------
 echo "testing wordpress started in vanilla mode..."
 MODE=
 start &
-sleep 20
+await_transform_finish "reset.sh"
 if [ "$( docker container inspect -f '{{.State.Running}}' $container )" == "false" ]; then
         fail "Vanilla container failed to start -- check container errors."
 fi
@@ -133,7 +132,7 @@ printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "Unscrambling wordpress scrambled repeatedly..."
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
-await_scramble_finish "Unscrambling"
+await_transform_finish "reset.sh"
 try_curl
 ensure_vanilla
 
@@ -144,8 +143,7 @@ echo "--------------------------------------------------------------------------
 echo "testing wordpress started in Polyscripted mode"
 MODE=polyscripted
 start &
-sleep 1
-await_scramble_finish "Scrambling"
+await_transform_finish "scramble.sh"
 echo "Testing container started"
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
 	fail "WordPess container failed to start -- check polyscripting errors."
@@ -163,7 +161,7 @@ printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "Unscrambling wordpress scrambled repeatedly..."
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
-await_scramble_finish "Unscrambling"
+await_transform_finish "reset.sh"
 try_curl
 ensure_vanilla
 
