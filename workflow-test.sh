@@ -111,32 +111,6 @@ function scramble {
   ensure_scrambled
 }
 
-printf "\n\n\n\n\n"
-echo "---------------------------------------------------------------------------------------------------"
-echo "testing wordpress started in vanilla mode..."
-MODE=
-start &
-sleep 20
-if [ "$( docker container inspect -f '{{.State.Running}}' $container )" == "false" ]; then
-        fail "Vanilla container failed to start -- check container errors."
-fi
-
-# Ensure works
-try_curl
-ensure_vanilla
-
-# Live-scramble through dispatcher multiple times and ensure works and is polyscripted
-repeated_scramble
-
-# Unscramble through dispatcher and ensure works
-printf "\n\n\n\n\n"
-echo "---------------------------------------------------------------------------------------------------"
-echo "Unscrambling wordpress scrambled repeatedly..."
-docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
-await_transform_finish "Unscrambling"
-try_curl
-ensure_vanilla
-
 
 docker stop mysql-host; docker stop $container
 printf "\n\n\n\n\n"
@@ -144,7 +118,7 @@ echo "--------------------------------------------------------------------------
 echo "testing wordpress started in Polyscripted mode"
 MODE=polyscripted
 start &
-sleep 1
+sleep 20
 await_transform_finish "Scrambling"
 echo "Testing container started"
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
@@ -170,5 +144,31 @@ ensure_vanilla
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
         fail "WordPess container failed -- check polyscripting errors."
 fi
+
+printf "\n\n\n\n\n"
+echo "---------------------------------------------------------------------------------------------------"
+echo "testing wordpress started in vanilla mode..."
+MODE=
+start &
+sleep 20
+if [ "$( docker container inspect -f '{{.State.Running}}' $container )" == "false" ]; then
+        fail "Vanilla container failed to start -- check container errors."
+fi
+
+# Ensure works
+try_curl
+ensure_vanilla
+
+# Live-scramble through dispatcher multiple times and ensure works and is polyscripted
+repeated_scramble
+
+# Unscramble through dispatcher and ensure works
+printf "\n\n\n\n\n"
+echo "---------------------------------------------------------------------------------------------------"
+echo "Unscrambling wordpress scrambled repeatedly..."
+docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
+await_transform_finish "Unscrambling"
+try_curl
+ensure_vanilla
 
 docker stop mysql-host; docker stop $container
