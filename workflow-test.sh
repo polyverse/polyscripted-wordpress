@@ -79,7 +79,6 @@ function ensure_vanilla {
   docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) == "" ]] || { echo "Wordpress is scrambled when not expected. Printing diff between /wordpress/index.php and /var/www/html/index.php."; diff /wordpress/index.php /var/www/html/index.php; exit 1; }'
   docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "Either one of PHP or Wordpress is scrambled when not expected. Expected Vanilla PHP was not able to successfully parse Vanilla /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
   docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "Either one of PHP or Wordpress is scrambled when not expected. Expected Vanilla PHP was not able to successfully parse Expected Vanilla /var/www/html/index.php and exited with code $retcode"; exit 1; fi;'
-  docker exec -t $container /bin/bash -c 's_php -l /wordpress/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "s_php is no longer Vanilla and was not able to successfully parse Polyscripted /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
 }
 
 function await_transform_finish {
