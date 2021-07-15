@@ -112,7 +112,6 @@ function scramble {
 }
 
 
-docker stop mysql-host; docker stop $container
 printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "testing wordpress started in Polyscripted mode"
@@ -144,6 +143,8 @@ ensure_vanilla
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
         fail "WordPess container failed -- check polyscripting errors."
 fi
+
+docker stop mysql-host; docker stop $container
 
 printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
