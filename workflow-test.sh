@@ -8,7 +8,8 @@ compose=$1
 
 function fail {
   echo "FATAL ERROR: $1" >&2
-  docker stop mysql-host; docker stop $container
+  docker rm -f mysql-host
+  docker rm -f $container
   exit 1
 }
 
@@ -146,7 +147,8 @@ if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "t
         fail "WordPess container failed -- check polyscripting errors."
 fi
 
-docker stop mysql-host; docker stop $container
+docker rm -f mysql-host
+docker rm -f $container
 
 printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
@@ -174,4 +176,5 @@ await_transform_finish "Unscrambling"
 try_curl
 ensure_vanilla
 
-docker stop mysql-host; docker stop $container
+docker rm -f mysql-host
+docker rm -f $container
