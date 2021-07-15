@@ -58,7 +58,7 @@ function start {
 function repeated_scramble {
   for i in {1..20}
   do
-    echo "\n\n\n\n\n"
+    printf "\n\n\n\n\n"
     echo "---------------------------------------------------------------------------------------------------"
     echo "Scrambling wordpress repeatedly. Now testing scramble $i of 20"
     scramble
@@ -111,7 +111,7 @@ function scramble {
   ensure_scrambled
 }
 
-echo "\n\n\n\n\n"
+printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "testing wordpress started in vanilla mode..."
 MODE=
@@ -129,7 +129,7 @@ ensure_vanilla
 repeated_scramble
 
 # Unscramble through dispatcher and ensure works
-echo "\n\n\n\n\n"
+printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "Unscrambling wordpress scrambled repeatedly..."
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
@@ -139,7 +139,7 @@ ensure_vanilla
 
 
 docker stop mysql-host; docker stop $container
-echo "\n\n\n\n\n"
+printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "testing wordpress started in Polyscripted mode"
 MODE=polyscripted
@@ -159,7 +159,7 @@ ensure_scrambled
 repeated_scramble
 
 # Unscramble through dispatcher and ensure works
-echo "\n\n\n\n\n"
+printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "Unscrambling wordpress scrambled repeatedly..."
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
