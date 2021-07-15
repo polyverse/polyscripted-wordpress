@@ -80,13 +80,9 @@ function ensure_vanilla {
 }
 
 function await_transform_finish {
-  # Wait 1 second for command to start...
-  sleep 1
-
   echo "Waiting for $1 to finish"
   {
-    is_running_command="ps aux |grep $1 | grep -v grep |wc -l"
-    while [[ "$(docker exec $container /bin/bash -c $is_running_command)" != "0" ]]; do
+    while [[ "$(docker exec $container /bin/bash -c 'ps aux |grep scramble.sh | grep -v grep |wc -l')" != "0" ]]; do
       #echo "Waiting for scrambling to finish... $(docker exec $container /bin/bash -c 'ps aux |grep scramble.sh | grep -v grep |wc -l')"
       sleep 1
     done
@@ -100,10 +96,15 @@ function await_transform_finish {
 function scramble {
   # Scramble/rescramble using either 1 or 2 as parameters to dispatcher
   scramble_dispatcher_command=$((1 + $RANDOM % 2))
-  scramble_bash_command="echo \"$scramble_dispatcher_command \" | nc localhost 2323"
-  docker exec -t $container /bin/bash -c $scramble_bash_command
 
-  await_transform_finish "scramble.sh"
+  # Using a dumb if-cascade because I don't know how to expand variables to bash -c
+  if [ "$scramble_dispatcher_command" == "1" ]; then
+    docker exec -t $container /bin/bash -c 'echo "1 " | nc localhost 2323'
+  elif [ "$scramble_dispatcher_command" == "2" ]; then
+    docker exec -t $container /bin/bash -c 'echo "2 " | nc localhost 2323'
+  fi
+
+  await_transform_finish "Scrambling"
 
   # Ensure works and is Polyscrpted
   try_curl
@@ -115,7 +116,7 @@ echo "--------------------------------------------------------------------------
 echo "testing wordpress started in vanilla mode..."
 MODE=
 start &
-await_transform_finish "reset.sh"
+sleep 20
 if [ "$( docker container inspect -f '{{.State.Running}}' $container )" == "false" ]; then
         fail "Vanilla container failed to start -- check container errors."
 fi
@@ -132,7 +133,7 @@ printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "Unscrambling wordpress scrambled repeatedly..."
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
-await_transform_finish "reset.sh"
+await_transform_finish "Unscrambling"
 try_curl
 ensure_vanilla
 
@@ -143,7 +144,8 @@ echo "--------------------------------------------------------------------------
 echo "testing wordpress started in Polyscripted mode"
 MODE=polyscripted
 start &
-await_transform_finish "scramble.sh"
+sleep 1
+await_transform_finish "Scrambling"
 echo "Testing container started"
 if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
 	fail "WordPess container failed to start -- check polyscripting errors."
@@ -161,7 +163,7 @@ printf "\n\n\n\n\n"
 echo "---------------------------------------------------------------------------------------------------"
 echo "Unscrambling wordpress scrambled repeatedly..."
 docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
-await_transform_finish "reset.sh"
+await_transform_finish "Unscrambling"
 try_curl
 ensure_vanilla
 
