@@ -7,12 +7,12 @@ if [ ! -f "${PHP_EXEC}/s_php" ]; then
     cp -p $PHP_EXEC/php $PHP_EXEC/s_php
 fi
 
-if [ ! -d "${POLYSCRIPT_PATH}/vanilla-save" ]; then
-    echo "Generating a Vanilla Save of the original PHP's lexx, yacc and phar.php files..."
-    mkdir $POLYSCRIPT_PATH/vanilla-save
-    cp -p $PHP_SRC_PATH/Zend/zend_language_scanner.l $POLYSCRIPT_PATH/vanilla-save/zend_language_scanner.l
-    cp -p $PHP_SRC_PATH/Zend/zend_language_parser.y $POLYSCRIPT_PATH/vanilla-save/zend_language_parser.y
-    cp -p $PHP_SRC_PATH/ext/phar/phar.php $POLYSCRIPT_PATH/vanilla-save/phar.php
+if [ ! -d "${POLYSCRIPT_PATH}/vanilla-php" ]; then
+    echo "Backing up to Vanilla PHP directory before scrambling..."
+    cp -ra $PHP_SRC_PATH $POLYSCRIPT_PATH/vanilla-php
+else
+    echo "Restoring from vanilla php before scrambling..."
+    rm -rf $PHP_SRC_PATH; cp -ra $POLYSCRIPT_PATH/vanilla-php $PHP_SRC_PATH
 fi
 
 echo "Creating a new PHP scramble..."
@@ -23,4 +23,7 @@ cp -p $PHP_SRC_PATH/ext/phar/phar.php .
 $PHP_EXEC/s_php tok-php-transformer.php -p $POLYSCRIPT_PATH/phar.php --replace
 mv $POLYSCRIPT_PATH/phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
-cd $PHP_SRC_PATH; make -o ext/phar/phar.php install -k; cd $POLYSCRIPT_PATH;
+cd $PHP_SRC_PATH
+# Ingore errors in building PHP
+make -o ext/phar/phar.php install -k || true
+cd $POLYSCRIPT_PATH;

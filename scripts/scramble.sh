@@ -22,7 +22,7 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 
 	echo "===================== POLYSCRIPTING ENABLED =========================="
 	if [ -d /wordpress ]; then
-	    echo "Copying /wordpress to /var/www/html to be polyscripted in place..."
+	    echo "Copying /wordpress to /var/www/temp to be polyscripted in place..."
 	    echo "This will prevent changes from being saved back to /wordpress, but will protect"
 	    echo "against code injection attacks..."
 		cp -Rp /wordpress /var/www/temp
@@ -30,7 +30,10 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 
 	echo "Starting polyscripted WordPress"
 	cd $POLYSCRIPT_PATH
-	sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
+
+	if [[ -f /var/www/html/wp-config.php ]]; then
+		sed -i "/#mod_allow/a \define( 'DISALLOW_FILE_MODS', true );" /var/www/html/wp-config.php
+	fi
 
 	./build-scrambled.sh
 
@@ -39,8 +42,11 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 		memory_limit_params="--memory_limit=$TRANSFORMER_MEMORY_LIMIT"
 	fi
 
+	echo "About to scramble files in /var/www/temp..."
 	if [ -f scrambled.json ] && s_php tok-php-transformer.php $memory_limit_params -p /var/www/temp --replace; then
+		echo "Removing existing /var/www/html"
 		rm -rf /var/www/html
+		echo "Moving /var/www/temp->/var/www/html"
 		mv /var/www/temp /var/www/html
 		echo "Polyscripting enabled."
 		echo "done"
