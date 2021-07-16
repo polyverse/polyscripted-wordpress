@@ -1,9 +1,9 @@
 name: Publish 8.0 Apache Image
-on: 
+on:
   push:
     branches:
      - main
-  repository_dispatch:    
+  repository_dispatch:
    types: [build_8.0_apache]
 jobs:
     build:
@@ -15,7 +15,7 @@ jobs:
         run: ./publish-image.sh
         working-directory: ./php8.0/apache/
       - name: Test 8.0 WordPress Image
-        run: ./workflow-test.sh
+        run: cd tests && ./workflow-test.sh
         shell: bash
       - uses: docker/login-action@v1
         with:

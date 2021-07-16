@@ -1,9 +1,9 @@
 name: Publish 7.4 Apache Image
-on: 
+on:
   push:
     branches:
      - main
-  repository_dispatch:          
+  repository_dispatch:
    types: [build_7.4_apache]
 jobs:
     build:
@@ -15,7 +15,7 @@ jobs:
         run: ./publish-image.sh
         working-directory: ./php7.4/apache/
       - name: Test 7.4 WordPress Image
-        run: ./workflow-test.sh
+        run: cd tests && ./workflow-test.sh
         shell: bash
       - uses: docker/login-action@v1
         with:
