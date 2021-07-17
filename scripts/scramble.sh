@@ -10,12 +10,6 @@ if [ "$1" == "FIRST_CALL" ] && [ "$(ls -A /var/www/html)" ]; then
 	echo "To avoid destroying your code, aboring this container."
 
 	exit 1
-elif [ "$(ls -A /var/www/html)" ]; then
-	echo "The directory /var/www/html is non-empty, but this isn't the first call to scramble, therefore"
-	echo "a previous invocation of scramble has set this up. Deleting the directory brutally."
-	rm -rf /var/www/html
-else
-	rm -rf /var/www/html
 fi
 
 if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
