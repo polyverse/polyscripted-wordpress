@@ -44,9 +44,10 @@ function try_curl {
 }
 
 function start {
+  extra_docker_params="$1"
   if [[ -z $compose ]]; then
     docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-    docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress --link mysql-host:mysql -p 8000:80 ${image}
+    docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress $extra_docker_params --link mysql-host:mysql -p 8000:80 ${image}
   else
     echo "alpine"
     docker tag ${image} ${image}:alpine-7.2-test
@@ -130,15 +131,11 @@ function test_safe_mount_var_www_html {
   echo "---------------------------------------------------------------------------------------------------"
   echo "testing wordpress started in vanilla mode with /var/www/html mounted and non-empty..."
   MODE=
-  start &
+  start "-v $PWD/wordpress:/var/www/html" &
   sleep 20
-  if [ "$(docker container inspect -f '{{.State.Running}}' $container)" == "false" ]; then
-    fail "Vanilla container failed to start -- check container errors."
+  if [ "$(docker ps |grep wordpress)" != "" ]; then
+    fail "Polyscripted container with wordpress mounted at /var/www/html exists. This is not allowed for Polyscripted containers. They MUST ABORT when /var/www/html is non-empty."
   fi
-
-  # Ensure works
-  ensure_vanilla
-  try_curl
 
   docker rm -f mysql-host
   docker rm -f $container
@@ -147,18 +144,12 @@ function test_safe_mount_var_www_html {
   echo "---------------------------------------------------------------------------------------------------"
   echo "testing wordpress started in Polyscripted mode with /var/www/html mounted and non-empty..."
   MODE=polyscripted
-  start &
+  start "-v $PWD/wordpress:/var/www/html" &
   sleep 20
   echo "Testing container started"
-  if [[ ! "$(docker container inspect -f '{{.State.Running}}' $container)" == "true" ]]; then
-    fail "WordPess container failed to start -- check polyscripting errors."
+  if [ "$(docker ps |grep wordpress)" != "" ]; then
+    fail "Polyscripted container with wordpress mounted at /var/www/html exists. This is not allowed for Polyscripted containers. They MUST ABORT when /var/www/html is non-empty."
   fi
-
-  await_scramble_finish
-
-  # Ensure works and is Polyscrpted
-  ensure_scrambled
-  try_curl
 
   docker rm -f mysql-host
   docker rm -f $container
@@ -210,6 +201,7 @@ function test_start_vanilla_scramble_some_end_vanilla {
   if [ "$(docker container inspect -f '{{.State.Running}}' $container)" == "false" ]; then
     fail "Vanilla container failed to start -- check container errors."
   fi
+  await_reset_finish
 
   # Ensure works
   ensure_vanilla
@@ -244,9 +236,9 @@ function test_start_vanilla_scramble_some_end_vanilla {
 }
 
 function test_all {
+  test_safe_mount_var_www_html
   test_start_polyscripted_scramble_more_end_vanilla
   test_start_vanilla_scramble_some_end_vanilla
-  test_safe_mount_var_www_html
 }
 
 test_all
