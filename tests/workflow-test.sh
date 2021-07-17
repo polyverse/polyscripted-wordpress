@@ -56,11 +56,11 @@ function start {
 }
 
 function repeated_scramble {
-  for i in {1..5}
+  for i in {1..20}
   do
     printf "\n\n\n\n\n"
     echo "---------------------------------------------------------------------------------------------------"
-    echo "Scrambling wordpress repeatedly. Now testing scramble $i of 5"
+    echo "Scrambling wordpress repeatedly. Now testing scramble $i of 20"
     scramble
   done
 }
