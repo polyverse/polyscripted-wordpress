@@ -12,7 +12,7 @@ if [ ! -d "${POLYSCRIPT_PATH}/vanilla-php" ]; then
     cp -nra $PHP_SRC_PATH $POLYSCRIPT_PATH/vanilla-php
 else
     echo "Restoring from vanilla php before scrambling..."
-    rm -rf $PHP_SRC_PATH;
+    rm -rf $PHP_SRC_PATH
     cp -nra $POLYSCRIPT_PATH/vanilla-php $PHP_SRC_PATH
 fi
 
@@ -20,11 +20,11 @@ echo "Creating a new PHP scramble..."
 $POLYSCRIPT_PATH/php-scrambler
 
 cp -np $PHP_SRC_PATH/ext/phar/phar.php .
-$PHP_EXEC/s_php tok-php-transformer.php  -d scrambled.json -p $POLYSCRIPT_PATH/phar.php --replace
+$PHP_EXEC/s_php tok-php-transformer.php -d scrambled.json -p $POLYSCRIPT_PATH/phar.php --replace
 mv $POLYSCRIPT_PATH/phar.php $PHP_SRC_PATH/ext/phar/phar.php
 
 echo "Compiling and installing new scramble..."
 cd $PHP_SRC_PATH
 # Ingore errors in building PHP
 make -o ext/phar/phar.php install -k || true
-cd $POLYSCRIPT_PATH;
+cd $POLYSCRIPT_PATH

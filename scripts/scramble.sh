@@ -16,9 +16,9 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 
 	echo "===================== POLYSCRIPTING ENABLED =========================="
 	if [ -d /wordpress ]; then
-	    echo "Copying /wordpress to /var/www/temp to be polyscripted in place..."
-	    echo "This will prevent changes from being saved back to /wordpress, but will protect"
-	    echo "against code injection attacks..."
+		echo "Copying /wordpress to /var/www/temp to be polyscripted in place..."
+		echo "This will prevent changes from being saved back to /wordpress, but will protect"
+		echo "against code injection attacks..."
 		cp -nRp /wordpress /var/www/temp
 	fi
 
@@ -55,17 +55,17 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 	rm -rf /var/www/html/wp-content/uploads
 
 else
-    echo "Polyscripted mode is off. To enable it, either:"
-    echo "  1. Set the environment variable: MODE=polyscripted"
-    echo "  2. OR create a file at path: /polyscripted"
+	echo "Polyscripted mode is off. To enable it, either:"
+	echo "  1. Set the environment variable: MODE=polyscripted"
+	echo "  2. OR create a file at path: /polyscripted"
 
 	$POLYSCRIPT_PATH/reset.sh
 
 	echo "Removing /var/www/html..."
 	rm -rf /var/www/html
 
-    echo "Symlink the mounted /wordpress -> /var/www/html so it's editable"
-    ln -s /wordpress /var/www/html
+	echo "Symlink the mounted /wordpress -> /var/www/html so it's editable"
+	ln -s /wordpress /var/www/html
 fi
 
 if [ -d /var/www/html/wp-content/uploads ]; then

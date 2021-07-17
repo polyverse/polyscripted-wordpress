@@ -1,9 +1,9 @@
 #!/bin/bash
 set -ex
 
-image=`docker images | awk '{print $1}' |grep polyscripted-wordpress | awk 'NR==1'`
+image=$(docker images | awk '{print $1}' | grep polyscripted-wordpress | awk 'NR==1')
 container="wordpress"
-git_root=`git rev-parse --show-toplevel`
+git_root=$(git rev-parse --show-toplevel)
 compose=$1
 
 function fail {
@@ -23,7 +23,7 @@ function try_curl {
       if [[ $n -lt $max ]]; then
         ((n++))
         echo "Command failed. Attempt $n/$max:"
-        sleep $delay;
+        sleep $delay
       else
         fail "Unable to connect to WordPress after $n attempts."
       fi
@@ -31,35 +31,33 @@ function try_curl {
   done
   echo "Curled success. Checking Syntax."
 
-  if curl -f  http://localhost:8000/; then
-  	if curl -f http://localhost:8000/ | grep -q "error" ; then
-		  fail "Site ran with errors."
-  	else
-  		echo "Site ran successfully."
-  	fi
-   else
-	  fail "Site could not be reached"
+  if curl -f http://localhost:8000/; then
+    if curl -f http://localhost:8000/ | grep -q "error"; then
+      fail "Site ran with errors."
+    else
+      echo "Site ran successfully."
+    fi
+  else
+    fail "Site could not be reached"
   fi
 
-  }
-
+}
 
 function start {
-	if [[ -z $compose ]]; then
-		docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
-		docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress  --link mysql-host:mysql -p 8000:80 ${image}
-	else
-		echo "alpine"
-		docker tag ${image} ${image}:alpine-7.2-test
-		MODE=$MODE headsha="test" docker-compose -f $compose up
-	fi
+  if [[ -z $compose ]]; then
+    docker run --rm --name mysql-host -e MYSQL_ROOT_PASSWORD=qwerty -d mysql:5.7
+    docker run --rm -e MODE=$MODE --name $container -v $PWD/wordpress:/wordpress --link mysql-host:mysql -p 8000:80 ${image}
+  else
+    echo "alpine"
+    docker tag ${image} ${image}:alpine-7.2-test
+    MODE=$MODE headsha="test" docker-compose -f $compose up
+  fi
 }
 
 function repeated_scramble {
   count=$1
 
-  for i in $(seq 1 $count);
-  do
+  for i in $(seq 1 $count); do
     printf "\n\n\n\n\n"
     echo "---------------------------------------------------------------------------------------------------"
     echo "Scrambling wordpress repeatedly. Now testing scramble $i of $count"
@@ -68,11 +66,11 @@ function repeated_scramble {
 }
 
 function ensure_scrambled {
-    echo "Ensuring Wordpress is Scrambled"
-    docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) != "" ]] || { echo "Wordpress is not scrambled when expected. Empty diff between /wordpress/index.php and /var/www/html/index.php."; diff /wordpress/index.php /var/www/html/index.php; exit 1; }'
-    docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php; retcode=$?; if [[ $retcode -eq 0 ]]; then echo "Wordpress is not scrambled when expected. Polyscripted PHP was able to successfully parse Vanilla /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
-    docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "Wordpress transformation has probably failed. Polyscripted PHP was not able to successfully parse Polyscripted /var/www/html/index.php and exited with code $retcode"; exit 1; fi;'
-    docker exec -t $container /bin/bash -c 's_php -l /wordpress/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "s_php is no longer Vanilla and was not able to successfully parse Polyscripted /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
+  echo "Ensuring Wordpress is Scrambled"
+  docker exec -t $container /bin/bash -c '[[ $(diff /wordpress/index.php /var/www/html/index.php) != "" ]] || { echo "Wordpress is not scrambled when expected. Empty diff between /wordpress/index.php and /var/www/html/index.php."; diff /wordpress/index.php /var/www/html/index.php; exit 1; }'
+  docker exec -t $container /bin/bash -c 'php -l /wordpress/index.php; retcode=$?; if [[ $retcode -eq 0 ]]; then echo "Wordpress is not scrambled when expected. Polyscripted PHP was able to successfully parse Vanilla /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
+  docker exec -t $container /bin/bash -c 'php -l /var/www/html/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "Wordpress transformation has probably failed. Polyscripted PHP was not able to successfully parse Polyscripted /var/www/html/index.php and exited with code $retcode"; exit 1; fi;'
+  docker exec -t $container /bin/bash -c 's_php -l /wordpress/index.php; retcode=$?; if [[ $retcode -ne 0 ]]; then echo "s_php is no longer Vanilla and was not able to successfully parse Polyscripted /wordpress/index.php and exited with code $retcode"; exit 1; fi;'
 }
 
 function ensure_vanilla {
@@ -90,7 +88,7 @@ function await_scramble_finish {
     done
 
     sleep 1
-  } 2> /dev/null
+  } 2>/dev/null
 
   echo "Scrambling finished."
 }
@@ -103,7 +101,7 @@ function await_reset_finish {
     done
 
     sleep 1
-  } 2> /dev/null
+  } 2>/dev/null
 
   echo "Reset finished."
 }
@@ -126,7 +124,6 @@ function scramble {
   try_curl
 }
 
-
 function test_safe_mount_var_www_html {
 
   printf "\n\n\n\n\n"
@@ -135,18 +132,16 @@ function test_safe_mount_var_www_html {
   MODE=
   start &
   sleep 20
-  if [ "$( docker container inspect -f '{{.State.Running}}' $container )" == "false" ]; then
-          fail "Vanilla container failed to start -- check container errors."
+  if [ "$(docker container inspect -f '{{.State.Running}}' $container)" == "false" ]; then
+    fail "Vanilla container failed to start -- check container errors."
   fi
 
   # Ensure works
   ensure_vanilla
   try_curl
 
-
   docker rm -f mysql-host
   docker rm -f $container
-
 
   printf "\n\n\n\n\n"
   echo "---------------------------------------------------------------------------------------------------"
@@ -156,14 +151,13 @@ function test_safe_mount_var_www_html {
   sleep 20
   await_scramble_finish
   echo "Testing container started"
-  if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
+  if [[ ! "$(docker container inspect -f '{{.State.Running}}' $container)" == "true" ]]; then
     fail "WordPess container failed to start -- check polyscripting errors."
   fi
 
   # Ensure works and is Polyscrpted
   ensure_scrambled
   try_curl
-
 
   docker rm -f mysql-host
   docker rm -f $container
@@ -179,7 +173,7 @@ function test_start_polyscripted_scramble_more_end_vanilla {
   sleep 20
   await_scramble_finish
   echo "Testing container started"
-  if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
+  if [[ ! "$(docker container inspect -f '{{.State.Running}}' $container)" == "true" ]]; then
     fail "WordPess container failed to start -- check polyscripting errors."
   fi
 
@@ -199,8 +193,8 @@ function test_start_polyscripted_scramble_more_end_vanilla {
   ensure_vanilla
   try_curl
 
-  if [[ ! "$( docker container inspect -f '{{.State.Running}}' $container )" == "true" ]]; then
-          fail "WordPess container failed -- check polyscripting errors."
+  if [[ ! "$(docker container inspect -f '{{.State.Running}}' $container)" == "true" ]]; then
+    fail "WordPess container failed -- check polyscripting errors."
   fi
 
   docker rm -f mysql-host
@@ -215,8 +209,8 @@ function test_start_vanilla_scramble_some_end_vanilla {
   MODE=
   start &
   sleep 20
-  if [ "$( docker container inspect -f '{{.State.Running}}' $container )" == "false" ]; then
-          fail "Vanilla container failed to start -- check container errors."
+  if [ "$(docker container inspect -f '{{.State.Running}}' $container)" == "false" ]; then
+    fail "Vanilla container failed to start -- check container errors."
   fi
 
   # Ensure works
@@ -255,5 +249,3 @@ function test_all {
 }
 
 test_all
-
-

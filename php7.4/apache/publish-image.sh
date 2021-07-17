@@ -14,19 +14,19 @@ docker tag ${image}:apache-7.4-${headsha} ${image}:latest
 
 #Dockerhub Repository
 if [[ "$1" == "-p" ]]; then
-	docker push ${image}:apache-7.4-${headsha}
-	docker push ${image}:apache-7.4
-	docker push ${image}:latest
+        docker push ${image}:apache-7.4-${headsha}
+        docker push ${image}:apache-7.4
+        docker push ${image}:latest
 fi
 #Github Container Repository
 if [[ "$1" == "-g" ]]; then
         echo "Pushing to Github Container Repository"
 
-	# Push specific sha
+        # Push specific sha
         docker tag ${image}:apache-7.4-${headsha} ghcr.io/${image}:apache-7.4-${headsha}
         docker push ghcr.io/${image}:apache-7.4-${headsha}
 
-	# Push latest
+        # Push latest
         docker tag ${image}:apache-7.4-${headsha} ghcr.io/${image}:apache-7.4
         docker push ghcr.io/${image}:apache-7.4
 fi

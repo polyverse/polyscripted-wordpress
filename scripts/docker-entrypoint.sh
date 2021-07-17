@@ -17,7 +17,7 @@ file_env() {
 	if [ "${!var:-}" ]; then
 		val="${!var}"
 	elif [ "${!fileVar:-}" ]; then
-		val="$(< "${!fileVar}")"
+		val="$(<"${!fileVar}")"
 	fi
 	export "$var"="$val"
 	unset "$fileVar"
@@ -26,19 +26,19 @@ file_env() {
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	if [ "$(id -u)" = '0' ]; then
 		case "$1" in
-			apache2*)
-				user="${APACHE_RUN_USER:-www-data}"
-				group="${APACHE_RUN_GROUP:-www-data}"
+		apache2*)
+			user="${APACHE_RUN_USER:-www-data}"
+			group="${APACHE_RUN_GROUP:-www-data}"
 
-				# strip off any '#' symbol ('#1000' is valid syntax for Apache)
-				pound='#'
-				user="${user#$pound}"
-				group="${group#$pound}"
-				;;
-			*) # php-fpm
-				user='www-data'
-				group='www-data'
-				;;
+			# strip off any '#' symbol ('#1000' is valid syntax for Apache)
+			pound='#'
+			user="${user#$pound}"
+			group="${group#$pound}"
+			;;
+		*) # php-fpm
+			user='www-data'
+			group='www-data'
+			;;
 		esac
 	else
 		user="$(id -u)"
@@ -75,13 +75,13 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		)
 		if [ "$user" != '0' ]; then
 			# avoid "tar: .: Cannot utime: Operation not permitted" and "tar: .: Cannot change mode to rwxr-xr-x: Operation not permitted"
-			targetTarArgs+=( --no-overwrite-dir )
+			targetTarArgs+=(--no-overwrite-dir)
 		fi
 		tar "${sourceTarArgs[@]}" . | tar "${targetTarArgs[@]}"
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
 			# NOTE: The "Indexes" option is disabled in the php:apache base image
-			cat > .htaccess <<-'EOF'
+			cat >.htaccess <<-'EOF'
 				# BEGIN WordPress
 				<IfModule mod_rewrite.c>
 				RewriteEngine On
@@ -167,7 +167,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 					}
 				}
 				{ print }
-			' wp-config-sample.php > wp-config.php <<'EOPHP'
+			' wp-config-sample.php >wp-config.php <<'EOPHP'
 // If we're behind a proxy server and using HTTPS, we need to alert WordPress of that fact
 // see also http://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
@@ -176,7 +176,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 
 EOPHP
 			chown "$user:$group" wp-config.php
-		elif [ -e wp-config.php ] && [ -n "$WORDPRESS_CONFIG_EXTRA" ] && [[ "$(< wp-config.php)" != *"$WORDPRESS_CONFIG_EXTRA"* ]]; then
+		elif [ -e wp-config.php ] && [ -n "$WORDPRESS_CONFIG_EXTRA" ] && [[ "$(<wp-config.php)" != *"$WORDPRESS_CONFIG_EXTRA"* ]]; then
 			# (if the config file already contains the requested PHP code, don't print a warning)
 			echo >&2
 			echo >&2 'WARNING: environment variable "WORDPRESS_CONFIG_EXTRA" is set, but "wp-config.php" already exists'
@@ -240,7 +240,7 @@ EOPHP
 			set_config 'WP_DEBUG' 1 boolean
 		fi
 
-		if ! TERM=dumb php -- <<'EOPHP'
+		if ! TERM=dumb php -- <<'EOPHP'; then
 <?php
 // database might not exist, so let's try creating it (just to be safe)
 
@@ -281,7 +281,7 @@ if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_strin
 
 $mysql->close();
 EOPHP
-		then
+
 			echo >&2
 			echo >&2 "WARNING: unable to establish a database connection to '$WORDPRESS_DB_HOST'"
 			echo >&2 '  continuing anyways (which might have unexpected results)'
@@ -306,8 +306,8 @@ fi
 mkfifo /usr/local/bin/polyscripting/to_main_process
 
 echo "Forking off dispatcher and running $@..."
-/usr/local/bin/polyscripting/dispatch.sh 2323 >& /usr/local/bin/polyscripting/to_main_process &
-/usr/local/bin/tini -s -- "$@" >& /usr/local/bin/polyscripting/to_main_process &
+/usr/local/bin/polyscripting/dispatch.sh 2323 >&/usr/local/bin/polyscripting/to_main_process &
+/usr/local/bin/tini -s -- "$@" >&/usr/local/bin/polyscripting/to_main_process &
 
 # Infinite wait and print to stdout
 echo "Capturing dispatcher and apache output to stdout..."
