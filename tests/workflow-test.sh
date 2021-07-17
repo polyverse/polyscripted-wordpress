@@ -149,11 +149,12 @@ function test_safe_mount_var_www_html {
   MODE=polyscripted
   start &
   sleep 20
-  await_scramble_finish
   echo "Testing container started"
   if [[ ! "$(docker container inspect -f '{{.State.Running}}' $container)" == "true" ]]; then
     fail "WordPess container failed to start -- check polyscripting errors."
   fi
+
+  await_scramble_finish
 
   # Ensure works and is Polyscrpted
   ensure_scrambled
@@ -171,11 +172,12 @@ function test_start_polyscripted_scramble_more_end_vanilla {
   MODE=polyscripted
   start &
   sleep 20
-  await_scramble_finish
   echo "Testing container started"
   if [[ ! "$(docker container inspect -f '{{.State.Running}}' $container)" == "true" ]]; then
     fail "WordPess container failed to start -- check polyscripting errors."
   fi
+
+  await_scramble_finish
 
   # Ensure works and is Polyscrpted
   ensure_scrambled
@@ -192,10 +194,6 @@ function test_start_polyscripted_scramble_more_end_vanilla {
   await_reset_finish
   ensure_vanilla
   try_curl
-
-  if [[ ! "$(docker container inspect -f '{{.State.Running}}' $container)" == "true" ]]; then
-    fail "WordPess container failed -- check polyscripting errors."
-  fi
 
   docker rm -f mysql-host
   docker rm -f $container
