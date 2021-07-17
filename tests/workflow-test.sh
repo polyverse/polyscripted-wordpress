@@ -218,10 +218,13 @@ function test_start_vanilla_scramble_some_end_vanilla {
   printf "\n\n\n\n\n"
   echo "---------------------------------------------------------------------------------------------------"
   echo "Testing wordpress started vanilla and reset again, stays vanilla..."
+  docker exec -t $container /bin/bash -c 'echo "3 " | nc localhost 2323'
+  await_reset_finish
 
   # Ensure works
   ensure_vanilla
   try_curl
+
 
   # Live-scramble through dispatcher multiple times and ensure works and is polyscripted
   repeated_scramble 2
