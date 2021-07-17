@@ -61,7 +61,10 @@ else
 
 	$POLYSCRIPT_PATH/reset.sh
 
-    # Symlink the mount so it's editable
+	echo "Removing /var/www/html..."
+	rm -rf /var/www/html
+
+    echo "Symlink the mounted /wordpress -> /var/www/html so it's editable"
     ln -s /wordpress /var/www/html
 fi
 
