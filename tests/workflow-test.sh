@@ -137,8 +137,7 @@ function test_safe_mount_var_www_html {
     fail "Polyscripted container with wordpress mounted at /var/www/html exists. This is not allowed for Polyscripted containers. They MUST ABORT when /var/www/html is non-empty."
   fi
 
-  docker rm -f mysql-host
-  docker rm -f $container
+  {docker rm -f mysql-host; docker rm -f $container;}
 
   printf "\n\n\n\n\n"
   echo "---------------------------------------------------------------------------------------------------"
@@ -151,8 +150,7 @@ function test_safe_mount_var_www_html {
     fail "Polyscripted container with wordpress mounted at /var/www/html exists. This is not allowed for Polyscripted containers. They MUST ABORT when /var/www/html is non-empty."
   fi
 
-  docker rm -f mysql-host
-  docker rm -f $container
+  {docker rm -f mysql-host; docker rm -f $container;}
 
 }
 
@@ -186,8 +184,7 @@ function test_start_polyscripted_scramble_more_end_vanilla {
   ensure_vanilla
   try_curl
 
-  docker rm -f mysql-host
-  docker rm -f $container
+  {docker rm -f mysql-host; docker rm -f $container;}
 
 }
 
@@ -230,8 +227,7 @@ function test_start_vanilla_scramble_some_end_vanilla {
   ensure_vanilla
   try_curl
 
-  docker rm -f mysql-host
-  docker rm -f $container
+  {docker rm -f mysql-host; docker rm -f $container;}
 
 }
 
